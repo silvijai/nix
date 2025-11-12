@@ -2,20 +2,17 @@
 let
   mkNixosSystem = { hostname, modules, homeModule, user }:
     inputs.nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
+      system = "aarch64-linux";  # Changed for Apple Silicon
       
       modules = [
-        # Allow unfree at system level
         { nixpkgs.config.allowUnfree = true; }
         
-        # Hardware config
         ({ lib, ... }: {
           imports = lib.optional 
             (builtins.pathExists /etc/nixos/hardware-configuration.nix)
             /etc/nixos/hardware-configuration.nix;
         })
         
-        # FIXED: Use correct relative path from parts/ directory
         ../hosts/${hostname}/configuration.nix
         ../modules/nixos-common.nix
       ] ++ modules ++ [
@@ -36,15 +33,23 @@ in
   flake.nixosConfigurations = {
     nixos-server = mkNixosSystem {
       hostname = "nixos-server";
-      modules = [ ../modules/server.nix ];  # FIXED: Add ../
-      homeModule = ../home/server.nix;      # FIXED: Add ../
+      modules = [ ../modules/server.nix ];
+      homeModule = ../home/server.nix;
       user = "MAID0";
     };
     
     linux-laptop = mkNixosSystem {
       hostname = "linux-laptop";
-      modules = [ ../modules/desktop.nix ];  # FIXED: Add ../
-      homeModule = ../home/desktop.nix;      # FIXED: Add ../
+      modules = [ ../modules/desktop.nix ];
+      homeModule = ../home/desktop.nix;
+      user = "viliusi";
+    };
+
+    # New UTM VM configuration
+    nixos-utm = mkNixosSystem {
+      hostname = "nixos-utm";
+      modules = [ ../modules/desktop.nix ]; 
+      homeModule = ../home/desktop.nix;
       user = "viliusi";
     };
   };

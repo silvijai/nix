@@ -1,19 +1,27 @@
-{ config, pkgs, inputs, lib, username, ... }: {
-  # System user for user-specific options
+{ config, pkgs, inputs, lib, username, ... }:
+let
+  apps = import ../home/shared/packages/cross-platform-apps.nix { inherit pkgs lib; };
+in
+{
+  # Set primary user
   system.primaryUser = username;
 
-  # Disable nix-darwin's Nix management (using Determinate Nix instead)
+  # Disable nix-darwin's Nix management (using Determinate Nix)
   nix.enable = false;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.hostPlatform = "aarch64-darwin";
 
-  # System-wide packages (available to all users)
+  # System packages
   environment.systemPackages = with pkgs; [
     dockutil
+    vim
+    git
+    htop
   ];
 
-  # Homebrew (applies to primaryUser)
+  # Homebrew
   homebrew = {
     enable = true;
     onActivation = {
@@ -22,10 +30,9 @@
       upgrade = true;
     };
     
-    brews = [ ];
+    brews = [ "mas" ];
     
-    # Import from cross-platform-apps.nix
-    casks = (import ./home/shared/packages/cross-platform-apps.nix { inherit pkgs lib; }).macosPreferCask;
+    casks = apps.macosPreferCask;
     
     masApps = {
       "Amphetamine" = 937984704;
@@ -37,14 +44,15 @@
       "DaVinci Resolve" = 571213070;
     };
   };
- 
-  # System defaults (apply to primaryUser)
+
+  # System defaults
   system.defaults = {
     dock = {
       autohide = true;
       show-recents = false;
       orientation = "left";
       tilesize = 48;
+      mru-spaces = false;
     };
 
     finder = {
@@ -52,6 +60,13 @@
       FXPreferredViewStyle = "clmv";
       ShowPathbar = true;
       ShowStatusBar = true;
+      FXEnableExtensionChangeWarning = false;
+    };
+
+    NSGlobalDomain = {
+      AppleInterfaceStyle = "Dark";
+      KeyRepeat = 2;
+      InitialKeyRepeat = 15;
     };
 
     loginwindow.GuestEnabled = false;
@@ -59,23 +74,22 @@
     spaces.spans-displays = false;
   };
 
-  # Fonts (individual Nerd Fonts packages - new syntax)
+  # Fonts
   fonts.packages = [
     pkgs.nerd-fonts.fira-code
     pkgs.nerd-fonts.jetbrains-mono
   ];
 
-  # Enable Zsh as default shell
+  # Enable Zsh
   programs.zsh.enable = true;
 
-  # Touch ID for sudo (new option path)
+  # Touch ID for sudo
   security.pam.services.sudo_local.touchIdAuth = true;
 
   # State version
   system.stateVersion = 4;
-  nixpkgs.hostPlatform = "aarch64-darwin";
 
-  # Simple: Create aliases in ~/Applications for Nix apps
+  # App aliases
   system.activationScripts.applications.text = let
     env = pkgs.buildEnv {
       name = "system-applications";
@@ -88,7 +102,6 @@
       rm -rf /Applications/Nix\ Apps
       mkdir -p /Applications/Nix\ Apps
       
-      # Search in both system and home manager packages
       for app_dir in ${env}/Applications /etc/profiles/per-user/${username}/home-path/Applications; do
         if [ -d "$app_dir" ]; then
           find "$app_dir" -maxdepth 1 \( -type l -o -type d -name "*.app" \) |
@@ -103,4 +116,3 @@
       done
     '';
 }
-

@@ -3,7 +3,6 @@
   programs.kitty = {
     enable = true;
     
-    # Use themeFile instead of theme
     themeFile = "Catppuccin-Mocha";
     
     font = {
@@ -24,7 +23,6 @@
       tab_bar_style = "powerline";
       tab_bar_edge = "top";
       
-      # Catppuccin Mocha colors (manual definition since themeFile might not work)
       foreground = "#CDD6F4";
       background = "#1E1E2E";
       selection_foreground = "#1E1E2E";
@@ -62,4 +60,7 @@
       "ctrl+shift+backspace" = "change_font_size all 0";
     };
   };
+  
+  # Force overwrite existing config
+  xdg.configFile."kitty/kitty.conf".force = true;
 }

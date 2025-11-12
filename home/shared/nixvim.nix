@@ -111,29 +111,63 @@
       comment.enable = true;
       vim-surround.enable = true;
 
-      # CORRECT SPELLING: avante (not avente!)
       avante = {
         enable = true;
         settings = {
-          provider = "claude";
-          claude = {
-            endpoint = "https://api.anthropic.com";
-            model = "claude-3-5-sonnet-20241022";
-            temperature = 0;
-            max_tokens = 4096;
+          provider = "ollama";
+          
+          providers = {
+            ollama = {
+              endpoint = "http://127.0.0.1:11434";
+              model = "qwen2.5-coder:3b";
+              timeout = 60000;
+              extra_request_body = {
+                options = {
+                  temperature = 0.7;
+                  num_ctx = 8192;
+                  num_predict = 2048;
+                };
+              };
+            };
+          };
+          
+          behaviour = {
+            auto_suggestions = false;
+            auto_set_highlight_group = true;
+            auto_set_keymaps = true;
+            auto_add_current_file = true;  # Automatically add current file
+          };
+          
+          # Configure file selector
+          selector = {
+            provider = "telescope";  # Use telescope for better file selection
           };
         };
       };
     };
 
     keymaps = [
+      # Explorer
       { mode = "n"; key = "<C-n>"; action = ":Neotree toggle<CR>"; options.desc = "Toggle Explorer"; }
+      
+      # Avante chat
       { mode = "n"; key = "<leader>aa"; action = ":AvanteAsk<CR>"; options.desc = "Avante Ask"; }
       { mode = "v"; key = "<leader>aa"; action = ":AvanteAsk<CR>"; options.desc = "Avante Ask"; }
+      { mode = "n"; key = "<leader>ar"; action = ":AvanteRefresh<CR>"; options.desc = "Avante Refresh"; }
+      { mode = "n"; key = "<leader>at"; action = ":AvanteToggle<CR>"; options.desc = "Avante Toggle"; }
+      { mode = "n"; key = "<leader>af"; action = ":AvanteFocus<CR>"; options.desc = "Avante Focus"; }
+      
+      # Avante file management (ADDED)
+      { mode = "n"; key = "<leader>ac"; action = "<cmd>lua require('avante.api').add_current_file()<CR>"; options.desc = "Add Current File"; }
+      { mode = "n"; key = "<leader>aB"; action = "<cmd>lua require('avante.api').add_all_buffers()<CR>"; options.desc = "Add All Buffers"; }
+      
+      # Window navigation
       { mode = "n"; key = "<C-h>"; action = "<C-w>h"; }
       { mode = "n"; key = "<C-j>"; action = "<C-w>j"; }
       { mode = "n"; key = "<C-k>"; action = "<C-w>k"; }
       { mode = "n"; key = "<C-l>"; action = "<C-w>l"; }
+      
+      # Save/quit
       { mode = "n"; key = "<leader>w"; action = ":w<CR>"; options.desc = "Save"; }
       { mode = "n"; key = "<leader>q"; action = ":q<CR>"; options.desc = "Quit"; }
     ];
