@@ -89,8 +89,7 @@
     nerd-fonts.fira-code
     nerd-fonts.jetbrains-mono
     noto-fonts
-    noto-fonts-emoji
-    noto-fonts-cjk
+    noto-fonts-color-emoji
   ];
 
   # Create user

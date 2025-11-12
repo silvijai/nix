@@ -15,8 +15,9 @@ let
             /etc/nixos/hardware-configuration.nix;
         })
         
-        ./hosts/${hostname}/configuration.nix
-        ./modules/nixos-common.nix
+        # FIXED: Use correct relative path from parts/ directory
+        ../hosts/${hostname}/configuration.nix
+        ../modules/nixos-common.nix
       ] ++ modules ++ [
         inputs.home-manager.nixosModules.home-manager {
           home-manager.useGlobalPkgs = true;
@@ -35,15 +36,15 @@ in
   flake.nixosConfigurations = {
     nixos-server = mkNixosSystem {
       hostname = "nixos-server";
-      modules = [ ./modules/server.nix ];
-      homeModule = ./home/server.nix;
+      modules = [ ../modules/server.nix ];  # FIXED: Add ../
+      homeModule = ../home/server.nix;      # FIXED: Add ../
       user = "MAID0";
     };
     
     linux-laptop = mkNixosSystem {
       hostname = "linux-laptop";
-      modules = [ ./modules/desktop.nix ];
-      homeModule = ./home/desktop.nix;
+      modules = [ ../modules/desktop.nix ];  # FIXED: Add ../
+      homeModule = ../home/desktop.nix;      # FIXED: Add ../
       user = "viliusi";
     };
   };

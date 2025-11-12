@@ -1,6 +1,5 @@
 { pkgs, lib, ... }:
 let
-  # Define flatpak apps list
   flatpakApps = [
     "io.github.zen_browser.zen"
     "com.discordapp.Discord"
@@ -8,9 +7,14 @@ let
     "com.spotify.Client"
     "md.obsidian.Obsidian"
   ];
+  
+  # Create install script with proper escaping
+  installCommands = lib.concatMapStringsSep "\n" (app: 
+    "  echo 'Installing ${app}...'\n" +
+    "  flatpak install -y flathub '${app}' 2>&1 || echo 'Failed: ${app}'"
+  ) flatpakApps;
 in
 {
-  # Apps available via Nix on both macOS and Linux
   both = with pkgs; [
     vscodium
     git
@@ -34,7 +38,6 @@ in
     cryptomator
   ];
 
-  # macOS: Prefer Homebrew casks
   macosPreferCask = [
     "raycast"
     "alt-tab"
@@ -58,7 +61,6 @@ in
     "openmtp"
   ];
 
-  # Linux: Additional Nix packages
   linuxNix = with pkgs; [
     steam
     heroic
@@ -79,24 +81,23 @@ in
     wf-recorder
   ];
 
-  # Expose flatpak list
   linuxFlatpak = flatpakApps;
 
-  # Flatpak installation script - Fixed string interpolation
-  flatpakInstallScript = pkgs.writeShellScriptBin "flatpak-install" 
-    (''
-      #!/usr/bin/env bash
-      echo "📦 Installing Flatpak applications..."
-      
-      # Add flathub if not already added
+  flatpakInstallScript = pkgs.writeShellScriptBin "flatpak-install" ''
+    #!/usr/bin/env bash
+    set -euo pipefail
+    
+    echo "📦 Installing Flatpak applications..."
+    
+    # Add flathub
+    if ! flatpak remote-list | grep -q flathub; then
+      echo "Adding Flathub repository..."
       flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-      
-      # Install each app
-    '' + (lib.concatMapStringsSep "\n" (app: ''
-      echo "Installing ${app}..."
-      flatpak install -y flathub ${app} || echo "⚠️  Failed to install ${app}"
-    '') flatpakApps) + ''
-      
-      echo "✅ Flatpak installation complete!"
-    '');
+    fi
+    
+    # Install apps
+${installCommands}
+    
+    echo "✅ Flatpak installation complete!"
+  '';
 }
