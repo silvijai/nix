@@ -12,17 +12,17 @@ all: switch
 # Update flake inputs
 .PHONY: update
 update:
-	sudo nix flake update
+	nix flake update
 
 # Dry-run: show what would change
 .PHONY: dry-run
 dry-run:
-	sudo darwin-rebuild build --flake $(FLAKE) --dry-run
+	darwin-rebuild build --flake $(FLAKE) --dry-run
 
 # Build configuration
 .PHONY: build
 build:
-	sudo darwin-rebuild build --flake $(FLAKE)
+	darwin-rebuild build --flake $(FLAKE)
 
 # Build and activate (system + home manager)
 .PHONY: switch
@@ -32,28 +32,32 @@ switch:
 # Rollback to previous generation
 .PHONY: rollback
 rollback:
-	sudo darwin-rebuild rollback
+	darwin-rebuild rollback
 
 # Show current generation
 .PHONY: list-generations
 list-generations:
-	sudo darwin-rebuild --list-generations
+	darwin-rebuild --list-generations
 
 # Clean up old generations
 .PHONY: clean
 clean:
 	sudo nix-collect-garbage -d
-	sudo darwin-rebuild --list-generations
+	darwin-rebuild --list-generations
 
 # Format Nix files
 .PHONY: fmt
 fmt:
-	sudo nix fmt
+	nix fmt
 
 # Bootstrap (first time setup)
 .PHONY: bootstrap
 bootstrap:
 	sudo nix run nix-darwin -- switch --flake $(FLAKE)
+
+.PHONY: hm-switch
+hm-switch:
+	home-manager switch --flake .#viliusi
 
 # Help
 .PHONY: help

@@ -1,0 +1,13 @@
+# Hardware configurations (machine-specific)
+**/hardware-configuration.nix
+hardware-configuration.nix
+
+# Build results
+result
+result-*
+
+# Secrets
+secrets/
+*.key
+*.pem
+

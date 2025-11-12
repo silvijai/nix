@@ -1,97 +1,8 @@
-{ config, pkgs, inputs, ... }: 
-let
-  lib = pkgs.lib;  # Import lib for mkForce
-in {
+{ config, pkgs, inputs, ... }:
+{
   imports = [
     inputs.nixvim.homeModules.nixvim
   ];
-
-  # User info - Force absolute path to override any null conflicts
-  home.username = "viliusi";
-  home.homeDirectory = lib.mkForce "/Users/viliusi";  # mkForce overrides external null
-  home.stateVersion = "24.05";
-
-  # Let Home Manager manage itself
-  programs.home-manager.enable = true;
-
-  # User packages
-  home.packages = with pkgs; [
-    # Media-related packages
-    ffmpeg
-   
-    # Text and terminal utilities
-    jetbrains-mono
-
-    # Python packages
-    python3
-    virtualenv
-
-    # C#
-    dotnet-sdk
-
-    # JS
-    nodejs_24
-    corepack
-    nodePackages.eslint
-    nodePackages.prettier
-    nodePackages.typescript
-    nodePackages.typescript-language-server
-
-    # Graphical apps
-    vesktop
-    openutau
-    musescore
-    vscodium 
-    audacity
-
-    ollama
-    rustup
-    eza
-    glow
-    mkalias
-
-    docker-client
-    docker
-
-    wakeonlan
-  ];
-
-    # Zsh configuration - simplified for debugging
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-
-    # Remove dotDir temporarily - let it use default location
-    # dotDir = ".config/zsh";
-
-    shellAliases = {
-      ls = "eza --group-directories-first --icons --classify";
-      ll = "eza -l --group-directories-first --icons --classify --git";
-      la = "eza -la --group-directories-first --icons --classify --git";
-      lt = "eza -l --tree --level=2 --group-directories-first --icons";
-    };
-
-    initContent = ''
-      export EDITOR=nvim
-    '';
-  };
-
-
-  # Git configuration (updated for new settings structure)
-  programs.git = {
-    enable = true;
-    settings = {
-      user = {
-        name = "Vilius Ivanovas";  # Replace
-        email = "ivanovasvilius@example.com";  # Replace
-      };
-      init.defaultBranch = "main";
-      core.editor = "nvim";
-      pull.rebase = false;
-    };
-  }; 
 
   programs.nixvim = {
     enable = true;
@@ -100,7 +11,6 @@ in {
       mapleader = " ";
       maplocalleader = " ";
     };
-
 
     opts = {
       number = true;
@@ -146,17 +56,16 @@ in {
         };
       };
 
-      # Icons (explicitly enable to avoid deprecation warning)
       web-devicons.enable = true;
 
       # LSP
       lsp = {
         enable = true;
         servers = {
-          ts_ls.enable = true;  # Fixed: underscore not dash
-          rust_analyzer = {     # Fixed: underscore not dash
+          ts_ls.enable = true;
+          rust_analyzer = {
             enable = true;
-            installCargo = false;  # You manage Rust via rustup
+            installCargo = false;
             installRustc = false;
           };
           nixd.enable = true;
@@ -214,11 +123,11 @@ in {
 
       # Utilities
       comment.enable = true;
-      vim-surround.enable = true;  # Fixed: vim-surround not surround
+      vim-surround.enable = true;
     };
 
     keymaps = [
-      # Neo-tree - use Ctrl-n instead to avoid conflicts
+      # Neo-tree
       { mode = "n"; key = "<C-n>"; action = ":Neotree toggle<CR>"; options.desc = "Toggle Explorer"; }
 
       # Gen.nvim AI
@@ -260,14 +169,6 @@ in {
     '';
 
     colorschemes.catppuccin.enable = true;
-
-   };
-
-  # Direnv
-  programs.direnv = {
-    enable = true;
-    enableZshIntegration = true;
-    nix-direnv.enable = true;
   };
 }
 
