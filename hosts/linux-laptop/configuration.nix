@@ -1,19 +1,24 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
-  imports = [
-    ../../modules/desktop-environments/omarchy-inspired.nix
-  ];
-
   networking.hostName = "linux-laptop";
-  networking.useDHCP = true;
+  
+  # Use mkDefault so NetworkManager can override if needed
+  networking.useDHCP = lib.mkDefault true;
 
-  # Enable power management for laptop
-  powerManagement.enable = true;
-  services.tlp.enable = true;
+  # Boot configuration
+  boot.loader.systemd-boot.enable = lib.mkDefault true;
+  boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
 
-  # Enable NVIDIA if needed
-  # hardware.nvidia.modesetting.enable = true;
+  # Filesystem (will be overridden by hardware-configuration.nix)
+  fileSystems."/" = lib.mkDefault {
+    device = "/dev/disk/by-label/nixos";
+    fsType = "ext4";
+  };
+
+  fileSystems."/boot" = lib.mkDefault {
+    device = "/dev/disk/by-label/boot";
+    fsType = "vfat";
+  };
 
   system.stateVersion = "25.05";
 }
-

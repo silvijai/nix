@@ -1,64 +1,51 @@
 { config, pkgs, lib, ... }:
+let
+  apps = import ./packages/cross-platform-apps.nix { inherit pkgs lib; };
+in
 {
-  # Packages that work on BOTH macOS and Linux
-  home.packages = with pkgs; [
-    # === Development GUIs ===
-    vscodium
-    
-    # === Media & Creative ===
-    # Audio production
-    audacity
-    musescore
-    # (blender, krita via system-specific - see below)
-    
-    # === Communication ===
-    vesktop  # Discord client
-    
-    # === Utilities ===
-    ollama  # AI/LLM
-    
-  ] ++ lib.optionals pkgs.stdenv.isLinux [
-    # Linux-specific GUI apps
-    firefox
-    chromium
-    gimp
-    inkscape
-    blender
-    krita
-    vlc
-    libreoffice
-    
-  ] ++ lib.optionals pkgs.stdenv.isDarwin [
-    # macOS-specific utilities
-    mkalias  # For app aliasing
+  imports = [
+    ./apps/kitty.nix
   ];
 
-  # Shared aliases for workstation use
-  programs.zsh.shellAliases = {
-    # Development shortcuts
-    code = "codium";  # VSCodium
-    v = "nvim";
-    vi = "nvim";
-    
-    # Common operations
-    update-home = "home-manager switch --flake ~/dotfiles";
-  } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-    # macOS-specific aliases
-    update = "darwin-rebuild switch --flake ~/dotfiles";
-    wake-server = "wakeonlan XX:XX:XX:XX:XX:XX";
-  } // lib.optionalAttrs pkgs.stdenv.isLinux {
-    # Linux-specific aliases
-    update = "sudo nixos-rebuild switch --flake ~/dotfiles#linux-laptop";
-    pbcopy = "xclip -selection clipboard";
-    pbpaste = "xclip -selection clipboard -o";
+  # Install cross-platform apps via Nix
+  home.packages = apps.both
+    ++ lib.optionals pkgs.stdenv.isLinux (
+      apps.linuxNix ++ [ apps.flatpakInstallScript ]
+    );
+  
+  # Flatpak apps list for Linux
+  home.file = lib.mkIf pkgs.stdenv.isLinux {
+    ".local/share/flatpak/apps.txt".text = lib.concatStringsSep "\n" (
+      [ "# Flatpak applications to install" ] ++ apps.linuxFlatpak
+    );
   };
 
-  # Git config for workstation
-  programs.git.extraConfig = {
-    # Workstation-specific git settings
-    credential.helper = if pkgs.stdenv.isDarwin 
-      then "osxkeychain" 
-      else "libsecret";
-  };
+  # Workstation aliases
+  programs.zsh.shellAliases = lib.mkMerge [
+    {
+      code = "codium";
+      v = "nvim";
+      vi = "nvim";
+      term = "kitty";
+    }
+    (lib.mkIf pkgs.stdenv.isDarwin {
+      update = lib.mkDefault "darwin-rebuild switch --flake /Users/viliusi/nix";
+    })
+    (lib.mkIf pkgs.stdenv.isLinux {
+      update = lib.mkDefault "sudo nixos-rebuild switch --flake /home/viliusi/nix#linux-laptop";
+      
+      # Clipboard (Wayland)
+      pbcopy = "wl-copy";
+      pbpaste = "wl-paste";
+      
+      # Flatpak management
+      flatpak-install = "flatpak-install";
+      flatpak-update = "flatpak update -y";
+      flatpak-clean = "flatpak uninstall --unused -y";
+      flatpak-list = "flatpak list --app";
+      
+      # Check if app is using Wayland
+      wayland-check = "echo 'XDG_SESSION_TYPE:' $XDG_SESSION_TYPE && echo 'WAYLAND_DISPLAY:' $WAYLAND_DISPLAY";
+    })
+  ];
 }
-

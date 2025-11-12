@@ -1,53 +1,54 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
 {
   imports = [
     ./common.nix
     ./shared/development.nix
     ./shared/nixvim.nix
-    ./shared/workstation.nix
+    ./shared/workstation.nix  # Includes Kitty and Flatpak
     ./shared/shell.nix
   ];
 
   home.username = "viliusi";
   home.homeDirectory = "/home/viliusi";
 
-  # Hyprland configuration
+  # Override update alias
+  programs.zsh.shellAliases = {
+    update = lib.mkForce "sudo nixos-rebuild switch --flake /home/viliusi/nix#linux-laptop";
+  };
+
+  # Hyprland configuration (Wayland)
   wayland.windowManager.hyprland = {
     enable = true;
+    systemd.enable = true;  # Enable systemd integration
+    
     settings = {
-      # Monitor configuration
-      monitor = [
-        ",preferred,auto,1"
-      ];
-
-      # Startup applications
+      monitor = [ ",preferred,auto,1" ];
+      
       exec-once = [
         "waybar"
         "dunst"
         "swww init"
-        "swww img ~/Pictures/wallpaper.png"
+        "flatpak-install"  # Auto-install flatpak apps on first boot
       ];
 
-      # Input configuration
       input = {
         kb_layout = "us";
         follow_mouse = 1;
         touchpad = {
           natural_scroll = true;
+          disable_while_typing = true;
         };
       };
 
-      # General settings (Omarchy-inspired aesthetic)
       general = {
         gaps_in = 5;
         gaps_out = 10;
         border_size = 2;
         "col.active_border" = "rgba(cba6f7ff) rgba(94e2d5ff) 45deg";
         "col.inactive_border" = "rgba(313244ff)";
-        layout = "dwindle";  # Tiling layout
+        layout = "dwindle";
       };
 
-      # Decorations (modern look)
       decoration = {
         rounding = 8;
         blur = {
@@ -57,42 +58,34 @@
         };
         drop_shadow = true;
         shadow_range = 4;
-        shadow_render_power = 3;
         "col.shadow" = "rgba(1a1a1aee)";
       };
 
-      # Animations (smooth and modern)
       animations = {
         enabled = true;
-        bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
+        bezier = "smoothOut, 0.36, 0, 0.66, -0.56";
         animation = [
-          "windows, 1, 7, myBezier"
-          "windowsOut, 1, 7, default, popin 80%"
+          "windows, 1, 5, smoothOut, slide"
+          "windowsOut, 1, 4, smoothOut, slide"
           "border, 1, 10, default"
-          "fade, 1, 7, default"
-          "workspaces, 1, 6, default"
+          "fade, 1, 4, smoothOut"
+          "workspaces, 1, 5, smoothOut, slide"
         ];
       };
 
-      # Layouts
-      dwindle = {
-        pseudotile = true;
-        preserve_split = true;
-      };
-
-      # Key bindings (Omarchy-inspired)
       "$mod" = "SUPER";
       
       bind = [
-        # Basics
-        "$mod, Return, exec, alacritty"
+        # Terminal - Kitty!
+        "$mod, Return, exec, kitty"
+        
+        # Window management
         "$mod, Q, killactive"
-        "$mod, M, exit"
         "$mod, F, fullscreen"
         "$mod, Space, togglefloating"
         "$mod, D, exec, wofi --show drun"
         
-        # Window navigation (vim keys)
+        # Focus (vim keys)
         "$mod, h, movefocus, l"
         "$mod, l, movefocus, r"
         "$mod, k, movefocus, u"
@@ -122,173 +115,35 @@
         "$mod SHIFT, 4, movetoworkspace, 4"
         "$mod SHIFT, 5, movetoworkspace, 5"
         
-        # Screenshots
+        # Screenshots (Wayland)
         ", Print, exec, grim -g \"$(slurp)\" - | swappy -f -"
-        
-        # Scratchpad
-        "$mod, S, togglespecialworkspace"
-        "$mod SHIFT, S, movetoworkspace, special"
+        "$mod, Print, exec, grim - | swappy -f -"
       ];
 
-      # Mouse bindings
       bindm = [
         "$mod, mouse:272, movewindow"
         "$mod, mouse:273, resizewindow"
       ];
 
-      # Brightness and volume (laptop controls)
+      # Laptop media keys
       binde = [
         ", XF86MonBrightnessUp, exec, brightnessctl set 5%+"
         ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
         ", XF86AudioRaiseVolume, exec, pamixer -i 5"
         ", XF86AudioLowerVolume, exec, pamixer -d 5"
         ", XF86AudioMute, exec, pamixer -t"
+        ", XF86AudioPlay, exec, playerctl play-pause"
+        ", XF86AudioNext, exec, playerctl next"
+        ", XF86AudioPrev, exec, playerctl previous"
+      ];
+
+      # Environment for Wayland
+      env = [
+        "XCURSOR_SIZE,24"
+        "QT_QPA_PLATFORM,wayland;xcb"
+        "SDL_VIDEODRIVER,wayland"
+        "MOZ_ENABLE_WAYLAND,1"
       ];
     };
   };
-
-  # Waybar configuration (Omarchy-style status bar)
-  programs.waybar = {
-    enable = true;
-    settings = {
-      mainBar = {
-        layer = "top";
-        position = "top";
-        height = 34;
-        
-        modules-left = [ "hyprland/workspaces" "hyprland/window" ];
-        modules-center = [ "clock" ];
-        modules-right = [ "pulseaudio" "network" "battery" "tray" ];
-        
-        "hyprland/workspaces" = {
-          format = "{icon}";
-          format-icons = {
-            "1" = "";
-            "2" = "";
-            "3" = "";
-            "4" = "";
-            "5" = "";
-            default = "";
-          };
-        };
-        
-        clock = {
-          format = "{:%H:%M}";
-          format-alt = "{:%A, %B %d, %Y}";
-        };
-        
-        battery = {
-          format = "{icon} {capacity}%";
-          format-icons = ["" "" "" "" ""];
-        };
-        
-        network = {
-          format-wifi = " {essid}";
-          format-disconnected = "⚠ Disconnected";
-        };
-        
-        pulseaudio = {
-          format = "{icon} {volume}%";
-          format-icons = ["" "" ""];
-        };
-      };
-    };
-    
-    style = ''
-      * {
-        font-family: "JetBrainsMono Nerd Font";
-        font-size: 13px;
-      }
-      
-      window#waybar {
-        background: #1e1e2e;
-        color: #cdd6f4;
-        border-bottom: 2px solid #89b4fa;
-      }
-      
-      #workspaces button {
-        padding: 0 8px;
-        color: #6c7086;
-      }
-      
-      #workspaces button.active {
-        color: #89b4fa;
-      }
-      
-      #clock, #battery, #network, #pulseaudio {
-        padding: 0 10px;
-      }
-    '';
-  };
-
-  # Alacritty terminal (Omarchy-style)
-  programs.alacritty = {
-    enable = true;
-    settings = {
-      window = {
-        opacity = 0.95;
-        padding = {
-          x = 10;
-          y = 10;
-        };
-      };
-      
-      font = {
-        normal = {
-          family = "JetBrainsMono Nerd Font";
-          style = "Regular";
-        };
-        size = 12.0;
-      };
-      
-      colors = {
-        primary = {
-          background = "#1e1e2e";
-          foreground = "#cdd6f4";
-        };
-        # Catppuccin Mocha theme
-      };
-    };
-  };
-
-  # Wofi launcher (app menu)
-  programs.wofi = {
-    enable = true;
-    settings = {
-      width = 600;
-      height = 400;
-      location = "center";
-      show = "drun";
-      prompt = "Search...";
-      filter_rate = 100;
-      allow_markup = true;
-      no_actions = true;
-      halign = "fill";
-      orientation = "vertical";
-      content_halign = "fill";
-      insensitive = true;
-      allow_images = true;
-      image_size = 40;
-    };
-  };
-
-  # Additional Linux desktop packages
-  home.packages = with pkgs; [
-    # Theme tools
-    catppuccin-gtk
-    lxappearance  # GTK theme switcher
-    
-    # Wayland tools
-    wl-clipboard
-    wlr-randr
-    
-    # Screenshots/recording
-    flameshot
-    peek
-    
-    # System monitoring
-    btop
-    nvtop  # GPU monitoring
-  ];
 }
-

@@ -1,14 +1,17 @@
 { pkgs, lib, ... }:
 {
-  # Apps that work identically on both macOS and Linux via Nix
+  # Apps available via Nix on both macOS and Linux
   both = with pkgs; [
-    # Browsers (Nix versions work on both)
-    
-    
     # Development
     vscodium
     git
+    
+    # Terminal
     kitty
+    
+    # Browsers
+    firefox
+    chromium
     
     # Creative/Media
     blender
@@ -21,7 +24,7 @@
     vlc
     
     # Communication
-    vesktop
+    vesktop  # Discord alternative
     
     # Productivity
     obsidian
@@ -29,58 +32,108 @@
     libreoffice
     
     # Media utilities
-    makemkv  # DVD ripper
-    handbrake  # Video converter
+    makemkv
+    handbrake
     
     # Utilities
-    cryptomator  # Encrypted cloud storage
+    cryptomator
   ];
 
   # macOS: Prefer Homebrew casks (better integration)
   macosPreferCask = [
-    # These work better as casks on macOS
+    # System utilities
     "raycast"
     "alt-tab"
-    "amethyst"  # Tiling WM for macOS
+    "amethyst"
     "karabiner-elements"
     "aldente"
     
-    # Affinity suite (macOS optimized)
+    # Creative suite
     "affinity-designer"
     "affinity-publisher"
     "affinity-photo"
-    "affinity"
     
-    # Music production (macOS optimized)
+    # Music production
     "ableton-live-standard"
     "supercollider"
     
     # Gaming
     "steam"
     "heroic"
-    "whisky"  # Windows games on macOS
+    "whisky"
     
-    # Proton apps (best via casks)
+    # Proton suite
     "protonvpn"
     "proton-drive"
     "proton-pass"
     "proton-mail"
     
     # macOS-specific
-    "onyx"  # System maintenance
-    "utm"   # Virtual machines for macOS
-    "openmtp"  # Android file transfer
+    "onyx"
+    "utm"
+    "openmtp"
+
+    "raycast"
+    "kitty"
+    "deepl"
+    "obsidian"
+    "freecad"
+    "autodesk-fusion"
+    "protonvpn"
+    "proton-drive"
+    "proton-pass"
+    "proton-mail"
+    "github"
+    "the-unarchiver"
+    "zen"
+    "min"
+    "qutebrowser"
+    "sigmaos"
+    "amethyst"
+    "loop"
+    "affinity-designer"
+    "affinity-publisher"
+    "affinity-photo"
+    "affinity"
+    "blender"
+    "ableton-live-standard"
+    "lmms"
+    "deelay"
+    "darktable"
+    "anki"
+    "karabiner-elements"
+    "krita"
+    "makemkv"
+    "onyx"
+    "steam"
+    "whisky"
+    "surge-xt"
+    "librewolf"
+    "supercollider"
+    "utm"
+    "xld"
+    "iina"
+    "alt-tab"
+    "obs"
+    "musicbrainz-picard"
+    "aldente"
+    "openmtp"
+    "heroic"
+    "beeper"
+    "orion"
+    "fuse-t"
+    "cryptomator"
+    "ticktick"
+    "anythingllm"
+    "spotify"
   ];
 
-  # Linux alternatives/equivalents
-  linuxAlternatives = with pkgs; [
-    # Window management (built into desktop setup)
-    # rofi or wofi for app launcher
-    
+  # Linux: Additional tools & alternatives
+  linuxNix = with pkgs; [
     # Gaming
     steam
-    heroic  # Epic/GOG launcher
-    lutris  # Game launcher
+    heroic
+    lutris
     wine
     winetricks
     
@@ -88,15 +141,76 @@
     protonvpn-cli
     
     # System utilities
-    gparted  # Disk management
+    gparted
     gnome-disk-utility
     
     # Android
     android-file-transfer
     
-    # Additional Linux-specific tools
-    flameshot  # Screenshots
-    peek  # Screen recording
+    # Wayland tools
+    wl-clipboard
+    wev
+    wlr-randr
+    kanshi
+    
+    # Screenshots/recording
+    grim
+    slurp
+    swappy
+    wf-recorder
   ];
-}
 
+  # Flatpak apps (Linux only)
+  linuxFlatpak = [
+    # Browsers
+    "io.github.zen_browser.zen"
+    
+    # Communication
+    "com.discordapp.Discord"
+    "com.slack.Slack"
+    
+    # Creative (if not using Nix version)
+    "org.blender.Blender"
+    "org.gimp.GIMP"
+    "org.inkscape.Inkscape"
+    "org.audacityteam.Audacity"
+    
+    # Media
+    "org.videolan.VLC"
+    "com.spotify.Client"
+    "io.mpv.Mpv"
+    
+    # Productivity
+    "md.obsidian.Obsidian"
+    "net.ankiweb.Anki"
+    "org.libreoffice.LibreOffice"
+    "com.github.xournalpp.xournalpp"
+    
+    # Development
+    "com.visualstudio.code"  # If you prefer over vscodium
+    
+    # Gaming
+    "com.valvesoftware.Steam"
+    "com.heroicgameslauncher.hgl"
+    
+    # Utilities
+    "org.cryptomator.Cryptomator"
+  ];
+
+  # Flatpak installation script
+  flatpakInstallScript = pkgs.writeShellScriptBin "flatpak-install" ''
+    #!/usr/bin/env bash
+    echo "📦 Installing Flatpak applications..."
+    
+    # Add flathub if not already added
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    
+    # Install each app
+    ${lib.concatMapStringsSep "\n" (app: ''
+      echo "Installing ${app}..."
+      flatpak install -y flathub ${app} || echo "Failed to install ${app}"
+    '') linuxFlatpak}
+    
+    echo "✅ Flatpak installation complete!"
+  '';
+}

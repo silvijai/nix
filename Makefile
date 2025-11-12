@@ -1,76 +1,102 @@
-# Makefile for nix-darwin + Home Manager configuration
-
-# Variables
-HOSTNAME ?= $(shell hostname -s)
-FLAKE = .#darwinConfigurations.$(HOSTNAME)
-USER ?= $(shell whoami)
+.PHONY: help darwin nixos-server nixos-laptop vm check update clean fmt
 
 # Default target
-.PHONY: all
-all: switch
+help:
+	@echo "MAID Nix Configuration Management"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  make darwin         - Build and switch macOS configuration"
+	@echo "  make nixos-server   - Deploy to NixOS server (remote)"
+	@echo "  make nixos-laptop   - Build NixOS laptop configuration"
+	@echo "  make vm             - Build and run NixOS VM in UTM"
+	@echo "  make check          - Check flake validity"
+	@echo "  make update         - Update flake inputs"
+	@echo "  make fmt            - Format all nix files"
+	@echo "  make clean          - Clean build artifacts and old generations"
 
-# Update flake inputs
-.PHONY: update
+# macOS
+darwin:
+	@echo "Rebuilding macOS configuration..."
+	darwin-rebuild switch --flake .#Viliuss-MacBook-Pro
+
+darwin-test:
+	@echo "Testing macOS configuration (no switch)..."
+	darwin-rebuild build --flake .#Viliuss-MacBook-Pro
+
+# NixOS Server (deploy from Mac)
+nixos-server:
+	@echo "Deploying to NixOS server..."
+	nixos-rebuild switch --flake .#nixos-server \
+		--target-host maid-server \
+		--use-remote-sudo \
+		--build-host localhost
+
+nixos-server-test:
+	@echo "Testing server configuration..."
+	nixos-rebuild build --flake .#nixos-server
+
+# NixOS Laptop
+nixos-laptop:
+	@echo "Building NixOS laptop configuration..."
+	sudo nixos-rebuild switch --flake .#linux-laptop
+
+# VM for testing
+vm:
+	@echo "Building NixOS VM..."
+	nix build .#nixosConfigurations.nixos-vm.config.system.build.vm
+	@echo "VM built! Run with: ./result/bin/run-nixos-vm"
+
+vm-run: vm
+	@echo "Starting VM..."
+	./result/bin/run-nixos-vm
+
+# Maintenance
+check:
+	@echo "Checking flake..."
+	nix flake check
+
 update:
+	@echo "Updating flake inputs..."
 	nix flake update
+	git add flake.lock
+	git diff --cached flake.lock
 
-# Dry-run: show what would change
-.PHONY: dry-run
-dry-run:
-	darwin-rebuild build --flake $(FLAKE) --dry-run
-
-# Build configuration
-.PHONY: build
-build:
-	darwin-rebuild build --flake $(FLAKE)
-
-# Build and activate (system + home manager)
-.PHONY: switch
-switch:
-	sudo darwin-rebuild switch --flake $(FLAKE)
-
-# Rollback to previous generation
-.PHONY: rollback
-rollback:
-	darwin-rebuild rollback
-
-# Show current generation
-.PHONY: list-generations
-list-generations:
-	darwin-rebuild --list-generations
-
-# Clean up old generations
-.PHONY: clean
-clean:
-	sudo nix-collect-garbage -d
-	darwin-rebuild --list-generations
-
-# Format Nix files
-.PHONY: fmt
 fmt:
+	@echo "Formatting nix files..."
 	nix fmt
 
-# Bootstrap (first time setup)
-.PHONY: bootstrap
-bootstrap:
-	sudo nix run nix-darwin -- switch --flake $(FLAKE)
+clean:
+	@echo "Cleaning up..."
+	nix-collect-garbage -d
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		darwin-rebuild --list-generations | tail -5; \
+	fi
 
-.PHONY: hm-switch
-hm-switch:
-	home-manager switch --flake .#viliusi
+# Show current system info
+info:
+	@echo "System Information"
+	@echo "--------------------"
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		echo "System: macOS"; \
+		echo "Hostname: $$(hostname)"; \
+		echo "Generation: $$(darwin-rebuild --list-generations | tail -1)"; \
+	else \
+		echo "System: NixOS"; \
+		echo "Hostname: $$(hostname)"; \
+		nixos-version; \
+	fi
+	@echo ""
+	@echo "Flake inputs:"
+	@nix flake metadata --json | jq -r '.locks.nodes | to_entries[] | select(.key != "root") | "  \(.key): \(.value.locked.rev[0:7])"'
 
-# Help
-.PHONY: help
-help:
-	@echo "Available targets:"
-	@echo "  update         - Update flake inputs"
-	@echo "  dry-run        - Preview changes"
-	@echo "  build          - Build configuration"
-	@echo "  switch         - Build and activate (default)"
-	@echo "  rollback       - Rollback to previous generation"
-	@echo "  list-generations - Show system generations"
-	@echo "  clean          - Clean old generations"
-	@echo "  fmt            - Format Nix files"
-	@echo "  bootstrap      - First-time setup (use once)"
-	@echo "  help           - This help"
+# Git helpers
+commit:
+	@echo "Committing changes..."
+	git add .
+	git status
+	@read -p "Commit message: " msg; \
+	git commit -m "$$msg"
 
+sync: commit
+	@echo "Syncing with remote..."
+	git push

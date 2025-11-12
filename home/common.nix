@@ -1,35 +1,32 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   home.stateVersion = "24.05";
-
-  # Let Home Manager manage itself
   programs.home-manager.enable = true;
 
-  # Git - same everywhere
   programs.git = {
     enable = true;
-    userName = "Vilius Ivanovas";
-    userEmail = "ivanovasvilius@example.com";
-    extraConfig = {
+    settings = {
+      user = {
+        name = "Vilius Ivanovas";
+        email = "ivanovasvilius@example.com";
+      };
       init.defaultBranch = "main";
       core.editor = "nvim";
       pull.rebase = false;
     };
   };
 
-  # Basic Zsh
   programs.zsh = {
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
-
-    initExtra = ''
+    # Use lib.mkBefore for init code
+    initExtra = lib.mkBefore ''
       export EDITOR=nvim
     '';
   };
 
-  # Tmux
   programs.tmux = {
     enable = true;
     keyMode = "vi";
@@ -40,14 +37,12 @@
     '';
   };
 
-  # Direnv
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
     nix-direnv.enable = true;
   };
 
-  # Essential CLI tools
   home.packages = with pkgs; [
     curl
     wget
@@ -56,4 +51,3 @@
     glow
   ];
 }
-

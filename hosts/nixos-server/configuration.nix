@@ -1,8 +1,23 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   networking.hostName = "nixos-server";
 
-  # Static IP configuration (from your original config)
+  # Boot configuration
+  boot.loader.systemd-boot.enable = lib.mkDefault true;
+  boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
+
+  # Filesystem configuration (will be overridden by hardware-configuration.nix on actual machine)
+  fileSystems."/" = lib.mkDefault {
+    device = "/dev/disk/by-label/nixos";
+    fsType = "ext4";
+  };
+
+  fileSystems."/boot" = lib.mkDefault {
+    device = "/dev/disk/by-label/boot";
+    fsType = "vfat";
+  };
+
+  # Static IP configuration
   networking = {
     useDHCP = false;
     interfaces.enp0s31f6 = {
@@ -27,6 +42,8 @@
   services.jellyfin = {
     enable = true;
     openFirewall = true;
+    user = "MAID0";
+    dataDir = "/var/lib/jellyfin/";
   };
 
   system.stateVersion = "25.05";

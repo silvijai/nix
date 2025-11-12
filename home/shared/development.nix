@@ -19,21 +19,15 @@
     # Rust
     rustup
 
-    # Media tools (useful for dev work)
+    # Media tools
     ffmpeg
 
     # Utilities
     wakeonlan
   ];
 
-  # Development-focused shell aliases
+  # Development aliases
   programs.zsh.shellAliases = {
-    # Enhanced ls with eza
-    ls = "eza --group-directories-first --icons --classify";
-    ll = "eza -l --group-directories-first --icons --classify --git";
-    la = "eza -la --group-directories-first --icons --classify --git";
-    lt = "eza -l --tree --level=2 --group-directories-first --icons";
-    
     # Git shortcuts
     gs = "git status";
     gc = "git commit";
@@ -44,8 +38,6 @@
     
     # Development
     py = "python3";
-    ipy = "ipython";
     serve = "python3 -m http.server";
   };
 }
-

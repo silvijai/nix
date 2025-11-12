@@ -21,62 +21,12 @@
       autoUpdate = true;
       upgrade = true;
     };
+    
     brews = [ ];
-    casks = [
-      # Productivity Tools
-      "raycast"
-      "kitty"
-      "deepl"
-      "obsidian"
-      "freecad"
-      "autodesk-fusion"
-      "protonvpn"
-      "proton-drive"
-      "proton-pass"
-      "proton-mail"
-      "github"
-      "the-unarchiver"
-      "zen"
-      "min"
-      "qutebrowser"
-      "sigmaos"
-      "amethyst"
-      "loop"
-      "affinity-designer"
-      "affinity-publisher"
-      "affinity-photo"
-      "blender"
-      "ableton-live-standard"
-      "lmms"
-      "deelay"
-      "darktable"
-      "anki"
-      "karabiner-elements"
-      "krita"
-      "makemkv"
-      "onyx"
-      "steam"
-      "whisky"
-      "surge-xt"
-      "librewolf"
-      "supercollider"
-      "utm"
-      "xld"
-      "iina"
-      "alt-tab"
-      "obs"
-      "musicbrainz-picard"
-      "aldente"
-      "openmtp"
-      "heroic"
-      "beeper"
-      "orion"
-      "fuse-t"
-      "cryptomator"
-      "ticktick"
-      "anythingllm"
-      "spotify"
-    ];
+    
+    # Import from cross-platform-apps.nix
+    casks = (import ./home/shared/packages/cross-platform-apps.nix { inherit pkgs lib; }).macosPreferCask;
+    
     masApps = {
       "Amphetamine" = 937984704;
       "Week Number" = 6502579523;

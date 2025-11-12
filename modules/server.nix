@@ -1,20 +1,22 @@
-{ config, pkgs, user, ... }:
+{ config, pkgs, lib, user, ... }:
 {
-  # Latest kernel for best hardware support
+  # Latest kernel
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # Disable power management for 24/7 operation
+  # Disable power management
   powerManagement.enable = false;
 
-  # Laptop server: ignore lid closing
-  services.logind.extraConfig = ''
-    HandleLidSwitch=ignore
-    HandleLidSwitchDocked=ignore
-    HandleSuspendKey=ignore
-    HandleHibernateKey=ignore
-    IdleAction=ignore
-  '';
-
+  # Laptop server: ignore lid closing (CORRECT NEW SYNTAX)
+  services.logind.settings = {
+    Login = {
+      HandleLidSwitch = "ignore";
+      HandleLidSwitchDocked = "ignore";
+      HandleSuspendKey = "ignore";
+      HandleHibernateKey = "ignore";
+      IdleAction = "ignore";
+    };
+  };
+  
   systemd.sleep.extraConfig = ''
     AllowSuspend=no
     AllowHibernation=no
@@ -32,7 +34,7 @@
     ];
   };
   
-  # Allow passwordless sudo for server user
+  # Passwordless sudo
   security.sudo.extraRules = [{
     users = [ user ];
     commands = [{
@@ -45,14 +47,10 @@
   virtualisation.docker = {
     enable = true;
     enableOnBoot = true;
-    autoPrune = {
-      enable = true;
-      dates = "weekly";
-    };
+    autoPrune.enable = true;
   };
 
   environment.systemPackages = with pkgs; [
     docker-compose
   ];
 }
-
