@@ -1,5 +1,8 @@
 { config, pkgs, lib, ... }:
 {
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+
   # Nix configuration
   nix = {
     settings = {
@@ -46,4 +49,3 @@
     jq
   ];
 }
-

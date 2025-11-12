@@ -1,10 +1,9 @@
 {
-  description = "Multi-system configuration with flake-parts";
+  description = "MAID - Multi-system configuration with flake-parts";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     
-    # Flake-parts for modular configuration
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -28,13 +27,11 @@
 
   outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      # Define systems we support
       systems = [ 
-        "aarch64-darwin"  # Apple Silicon Macs
-        "x86_64-linux"    # Intel/AMD Linux
+        "aarch64-darwin"
+        "x86_64-linux"
       ];
 
-      # Import flake-parts modules
       imports = [
         ./parts/darwin.nix
         ./parts/nixos.nix
@@ -43,17 +40,23 @@
         ./parts/devshells.nix
       ];
 
-      # Global configuration available to all parts
+      # Allow unfree packages at flake level
       flake = {
-        # You can define shared values here
         lib.maid = {
           users = {
             darwin = "viliusi";
-            linux = "silvija";
+            linux = "viliusi";
             server = "MAID0";
           };
         };
       };
+      
+      # Configure nixpkgs for all systems
+      perSystem = { system, ... }: {
+        _module.args.pkgs = import inputs.nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
+      };
     };
 }
-
