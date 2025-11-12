@@ -1,19 +1,4 @@
 { pkgs, lib, ... }:
-let
-  flatpakApps = [
-    "io.github.zen_browser.zen"
-    "com.discordapp.Discord"
-    "com.slack.Slack"
-    "com.spotify.Client"
-    "md.obsidian.Obsidian"
-  ];
-  
-  # Create install script with proper escaping
-  installCommands = lib.concatMapStringsSep "\n" (app: 
-    "  echo 'Installing ${app}...'\n" +
-    "  flatpak install -y flathub '${app}' 2>&1 || echo 'Failed: ${app}'"
-  ) flatpakApps;
-in
 {
   both = with pkgs; [
     vscodium
@@ -81,23 +66,28 @@ in
     wf-recorder
   ];
 
-  linuxFlatpak = flatpakApps;
+  linuxFlatpak = [
+    "io.github.zen_browser.zen"
+    "com.discordapp.Discord"
+    "com.slack.Slack"
+    "com.spotify.Client"
+    "md.obsidian.Obsidian"
+  ];
 
+  # Simple bash script - no complex string interpolation
   flatpakInstallScript = pkgs.writeShellScriptBin "flatpak-install" ''
     #!/usr/bin/env bash
-    set -euo pipefail
     
-    echo "📦 Installing Flatpak applications..."
+    echo "Installing Flatpak applications..."
     
-    # Add flathub
-    if ! flatpak remote-list | grep -q flathub; then
-      echo "Adding Flathub repository..."
-      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    fi
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     
-    # Install apps
-${installCommands}
+    flatpak install -y flathub io.github.zen_browser.zen
+    flatpak install -y flathub com.discordapp.Discord
+    flatpak install -y flathub com.slack.Slack
+    flatpak install -y flathub com.spotify.Client
+    flatpak install -y flathub md.obsidian.Obsidian
     
-    echo "✅ Flatpak installation complete!"
+    echo "Done!"
   '';
 }

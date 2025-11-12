@@ -22,7 +22,6 @@
     };
 
     plugins = {
-      # File navigation
       telescope = {
         enable = true;
         keymaps = {
@@ -45,9 +44,7 @@
             };
           };
           filesystem = {
-            follow_current_file = {
-              enabled = true;
-            };
+            follow_current_file.enabled = true;
             filtered_items = {
               visible = true;
               hide_dotfiles = false;
@@ -58,7 +55,6 @@
 
       web-devicons.enable = true;
 
-      # LSP
       lsp = {
         enable = true;
         servers = {
@@ -72,30 +68,22 @@
         };
       };
 
-      # Treesitter
       treesitter = {
         enable = true;
         nixGrammars = true;
       };
 
-      # Completion
       cmp = {
         enable = true;
         autoEnableSources = true;
       };
 
-      # Git integration
       gitsigns.enable = true;
-
-      # UI improvements
       lualine.enable = true;
       which-key.enable = true;
       indent-blankline.enable = true;
-
-      # Navigation
       flash.enable = true;
 
-      # Formatting
       conform-nvim = {
         enable = true;
         settings = {
@@ -112,7 +100,6 @@
         };
       };
 
-      # Linting
       lint = {
         enable = true;
         lintersByFt = {
@@ -121,54 +108,36 @@
         };
       };
 
-      # Utilities
       comment.enable = true;
       vim-surround.enable = true;
+
+      # CORRECT SPELLING: avante (not avente!)
+      avante = {
+        enable = true;
+        settings = {
+          provider = "claude";
+          claude = {
+            endpoint = "https://api.anthropic.com";
+            model = "claude-3-5-sonnet-20241022";
+            temperature = 0;
+            max_tokens = 4096;
+          };
+        };
+      };
     };
 
     keymaps = [
-      # Neo-tree
       { mode = "n"; key = "<C-n>"; action = ":Neotree toggle<CR>"; options.desc = "Toggle Explorer"; }
-
-      # Gen.nvim AI
-      { mode = "n"; key = "<leader>ai"; action = ":Gen<CR>"; options.desc = "AI Sidebar"; }
-      { mode = "v"; key = "<leader>ai"; action = ":Gen<CR>"; options.desc = "AI Generate"; }
-      { mode = "n"; key = "<leader>ag"; action = ":Gen<CR>"; options.desc = "AI Prompt"; }
-      
-      # Window navigation
+      { mode = "n"; key = "<leader>aa"; action = ":AvanteAsk<CR>"; options.desc = "Avante Ask"; }
+      { mode = "v"; key = "<leader>aa"; action = ":AvanteAsk<CR>"; options.desc = "Avante Ask"; }
       { mode = "n"; key = "<C-h>"; action = "<C-w>h"; }
       { mode = "n"; key = "<C-j>"; action = "<C-w>j"; }
       { mode = "n"; key = "<C-k>"; action = "<C-w>k"; }
       { mode = "n"; key = "<C-l>"; action = "<C-w>l"; }
-      
-      # Save and quit
       { mode = "n"; key = "<leader>w"; action = ":w<CR>"; options.desc = "Save"; }
       { mode = "n"; key = "<leader>q"; action = ":q<CR>"; options.desc = "Quit"; }
     ];
 
-    extraPlugins = [
-      (pkgs.vimUtils.buildVimPlugin {
-        name = "gen.nvim";
-        src = pkgs.fetchFromGitHub {
-          owner = "David-Kunz";
-          repo = "gen.nvim";
-          rev = "main";
-          sha256 = "sha256-s12r8dvva0O2VvEPjOQvpjVpEehxsa4AWoGHXFYxQlI=";
-        };
-      })
-    ];
-
-    extraConfigLua = ''
-      require('gen').setup({
-        model = "qwen3:4b",
-        host = "localhost",
-        port = "11434",
-        display_mode = "float",
-        show_model = true,
-      })
-    '';
-
     colorschemes.catppuccin.enable = true;
   };
 }
-
