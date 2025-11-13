@@ -6,16 +6,17 @@
   # Disable power management
   powerManagement.enable = false;
 
-  # ignore lid closing
-  services.logind = {
-    extraConfig = ''
-      HandleLidSwitch=ignore
-      HandleLidSwitchDocked=ignore
-      HandleSuspendKey=ignore
-      HandleHibernateKey=ignore
-      IdleAction=ignore
-    '';
+  services.logind.settings = {
+    Login = {
+      HandleLidSwitch = "ignore";
+      HandleLidSwitchDocked = "ignore";
+      HandleSuspendKey = "ignore";
+      HandleHibernateKey = "ignore";
+      IdleAction = "ignore";
+    };
   };
+
+  
 
   systemd.sleep.extraConfig = ''
     AllowSuspend=no

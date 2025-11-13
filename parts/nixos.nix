@@ -7,14 +7,7 @@ let
       
       modules = [
         # Allow unfree packages
-        { nixpkgs.config.allowUnfree = true; }
-        
-        # Hardware configuration (optional)
-        ({ lib, ... }: {
-          imports = lib.optional 
-            (builtins.pathExists /etc/nixos/hardware-configuration.nix)
-            /etc/nixos/hardware-configuration.nix;
-        })
+        { nixpkgs.config.allowUnfree = true; } 
         
         # Host-specific configuration
         ../hosts/${hostname}/configuration.nix
