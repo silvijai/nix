@@ -3,9 +3,7 @@
   imports = [
     ./common.nix
     ./shared/development.nix
-    ./shared/nixvim.nix
     ./shared/workstation.nix  # Includes Kitty and Flatpak
-    ./shared/shell.nix
   ];
 
   home.username = "viliusi";

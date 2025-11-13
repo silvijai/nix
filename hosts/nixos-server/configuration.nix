@@ -1,35 +1,37 @@
 { config, pkgs, lib, ... }:
 {
-  networking.hostName = "nixos-server";
+  imports = [
+    ../../modules/server/jellyfin.nix
+  ];
 
   # Boot configuration
   boot.loader.systemd-boot.enable = lib.mkDefault true;
-  boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
+  boot.loader.efi.canTouchEfiVariables = lib.mkDefault true; 
 
-  # Filesystem configuration (will be overridden by hardware-configuration.nix on actual machine)
-  fileSystems."/" = lib.mkDefault {
-    device = "/dev/disk/by-label/nixos";
-    fsType = "ext4";
-  };
-
-  fileSystems."/boot" = lib.mkDefault {
-    device = "/dev/disk/by-label/boot";
-    fsType = "vfat";
-  };
-
-  # Static IP configuration
+  # static IP Adress
   networking = {
+    hostName = "nixos";
     useDHCP = false;
     interfaces.enp0s31f6 = {
       ipv4.addresses = [{
         address = "192.168.1.211";
-        prefixLength = 24;
+        prefixLength = 24; 
       }];
-      wakeOnLan.enable = true;
     };
     defaultGateway = "192.168.1.1";
     nameservers = [ "8.8.8.8" "1.1.1.1" ];
-    firewall.allowedUDPPorts = [ 9 ]; # Wake-on-LAN
+  };
+
+  # Wake-on-LAN
+  networking = {
+    interfaces = {
+      enp0s31f6 = {
+        wakeOnLan.enable = true;
+      };
+    };
+    firewall = {
+      allowedUDPPorts = [ 9 ];
+    };
   };
 
   # Audio (for Jellyfin transcoding)
@@ -38,13 +40,14 @@
     pulse.enable = true;
   };
 
-  # Jellyfin media server
-  services.jellyfin = {
+  # Enable the OpenSSH daemon.
+  services.openssh = {
     enable = true;
-    openFirewall = true;
-    user = "MAID0";
-    dataDir = "/var/lib/jellyfin/";
-  };
+    settings = {
+      PasswordAuthentication = true;
+      PermitRootLogin = "no";
+    };
+  }; 
 
   system.stateVersion = "25.05";
 }

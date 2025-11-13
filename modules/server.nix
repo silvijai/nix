@@ -6,17 +6,17 @@
   # Disable power management
   powerManagement.enable = false;
 
-  # Laptop server: ignore lid closing (CORRECT NEW SYNTAX)
-  services.logind.settings = {
-    Login = {
-      HandleLidSwitch = "ignore";
-      HandleLidSwitchDocked = "ignore";
-      HandleSuspendKey = "ignore";
-      HandleHibernateKey = "ignore";
-      IdleAction = "ignore";
-    };
+  # ignore lid closing
+  services.logind = {
+    extraConfig = ''
+      HandleLidSwitch=ignore
+      HandleLidSwitchDocked=ignore
+      HandleSuspendKey=ignore
+      HandleHibernateKey=ignore
+      IdleAction=ignore
+    '';
   };
-  
+
   systemd.sleep.extraConfig = ''
     AllowSuspend=no
     AllowHibernation=no

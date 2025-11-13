@@ -5,9 +5,7 @@ in {
   imports = [
     ./common.nix
     ./shared/development.nix
-    ./shared/nixvim.nix
     ./shared/workstation.nix     # ← Shared GUI apps
-    ./shared/shell.nix           # ← Enhanced shell
   ];
 
   # User info

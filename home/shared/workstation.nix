@@ -1,18 +1,39 @@
 { config, pkgs, lib, ... }:
 let
   apps = import ./packages/cross-platform-apps.nix { inherit pkgs lib; };
+  
+  # Architecture detection
+  isAarch64 = pkgs.stdenv.hostPlatform.isAarch64;
+  
+  # x86-only packages to exclude on ARM
+  x86OnlyPackages = [ "steam" "wine" "winetricks" "lutris" ];
+  
+  # Filter function
+  filterForArch = packageList:
+    if isAarch64 then
+      builtins.filter (pkg: 
+        !(builtins.elem (lib.getName pkg) x86OnlyPackages)
+      ) packageList
+    else packageList;
+      
+  # Filtered lists
+  compatibleBoth = filterForArch apps.both;
+  compatibleLinuxNix = filterForArch apps.linuxNix;
 in
 {
   imports = [
+    ./nixvim.nix
+    ./shell.nix
     ./apps/kitty.nix
   ];
 
-  # Install cross-platform apps via Nix
-  home.packages = apps.both
+  # ONLY CHANGE: Replace your home.packages line with:
+  home.packages = compatibleBoth
     ++ lib.optionals pkgs.stdenv.isLinux (
-      apps.linuxNix ++ [ apps.flatpakInstallScript ]
+      compatibleLinuxNix 
+      ++ [ apps.flatpakInstallScript ]
     );
-  
+
   # Flatpak apps list for Linux
   home.file = lib.mkIf pkgs.stdenv.isLinux {
     ".local/share/flatpak/apps.txt".text = lib.concatStringsSep "\n" (
