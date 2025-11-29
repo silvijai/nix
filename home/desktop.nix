@@ -6,8 +6,8 @@
     ./shared/workstation.nix  # Includes Kitty and Flatpak
   ];
 
-  home.username = "viliusi";
-  home.homeDirectory = "/home/viliusi";
+  home.username = "silvija";
+  home.homeDirectory = "/home/silvija";
 
   # Override update alias
   programs.zsh.shellAliases = {

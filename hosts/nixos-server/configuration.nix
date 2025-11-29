@@ -9,16 +9,7 @@
 
   # Boot configuration
   boot.loader.systemd-boot.enable = lib.mkDefault true;
-  boot.loader.efi.canTouchEfiVariables = lib.mkDefault true; 
-
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/1a2fddc4-604a-4192-939b-74684b2e0042";
-      fsType = "ext4";
-    };
-
-  swapDevices =
-    [ { device = "/dev/disk/by-uuid/084ac1c4-eabd-4fdf-9a3e-dc36c1c312bb"; }
-    ];
+  boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;  
 
   # static IP Adress
   networking = {
@@ -33,8 +24,9 @@
     };
     defaultGateway = "192.168.1.1";
     nameservers = [ "8.8.8.8" "1.1.1.1" ];
-    firewall.allowedUDPPorts = [ 9 ];
-  };
+    firewall.allowedTCPPorts = [ 8096 ];
+    firewall.allowedUDPPorts = [ 9 1900 7359 ];
+  }; 
 
   # Audio (for Jellyfin transcoding)
   services.pipewire = {

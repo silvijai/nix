@@ -10,14 +10,14 @@
         inputs.home-manager.darwinModules.home-manager {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.users.viliusi = import ../home/darwin.nix;
+          home-manager.users.silvija = import ../home/darwin.nix;
           home-manager.extraSpecialArgs = { inherit inputs; };
         }
       ];
       
       specialArgs = { 
         inherit inputs;
-        username = "viliusi";
+        username = "silvija";
       };
     };
   };

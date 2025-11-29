@@ -9,8 +9,8 @@ in {
   ];
 
   # User info
-  home.username = "viliusi";
-  home.homeDirectory = lib.mkForce "/Users/viliusi";
+  home.username = "silvija";
+  home.homeDirectory = lib.mkForce "/Users/silvija";
 
   # macOS-ONLY packages (things from Homebrew casks that need macOS)
   home.packages = with pkgs; [

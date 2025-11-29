@@ -44,8 +44,8 @@
       flake = {
         lib.maid = {
           users = {
-            darwin = "viliusi";
-            linux = "viliusi";
+            darwin = "silvija";
+            linux = "Silvia";
             server = "MAID0";
           };
         };

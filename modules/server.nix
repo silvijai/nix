@@ -14,9 +14,7 @@
       HandleHibernateKey = "ignore";
       IdleAction = "ignore";
     };
-  };
-
-  
+  }; 
 
   systemd.sleep.extraConfig = ''
     AllowSuspend=no
@@ -26,6 +24,7 @@
   # Create server user
   users.users.${user} = {
     isNormalUser = true;
+    hashedPassword = "$y$j9T$RJ6rQzBdZ80HYDi1PMtDP1$qRG2B4I/G/PPOl4FOs1LSDDGgU0d5TKCRqqxE7M9pq7";
     home = "/home/${user}";
     description = "MAID Server User";
     extraGroups = [ "wheel" "networkmanager" "docker" ];

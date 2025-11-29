@@ -78,6 +78,7 @@
     "anki"
     "deepl"
     "ticktick"
+    "browserosaurus"
     
     # Security/Privacy
     "protonvpn"

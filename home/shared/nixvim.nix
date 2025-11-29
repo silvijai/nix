@@ -105,6 +105,7 @@
         lintersByFt = {
           javascript = ["eslint"];
           typescript = ["eslint"];
+          
         };
       };
 
@@ -133,7 +134,7 @@
           
           behaviour = {
             auto_suggestions = false;
-            auto_set_highlight_group = true;
+            auto_set_highlight_group = false;
             auto_set_keymaps = true;
             auto_add_current_file = true;  # Automatically add current file
           };
@@ -173,5 +174,36 @@
     ];
 
     colorschemes.catppuccin.enable = true;
+
+    extraConfigLua = ''
+      -- Minimalist diagnostic icons (nerd font recommended)
+      local signs = { Error = "", Warn = "", Hint = "󰛩", Info = "" }
+      for type, icon in pairs(signs) do
+        local hl = "DiagnosticSign" .. type
+        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+      end
+
+      -- Diagnostic display config
+      vim.diagnostic.config({
+        virtual_text = {
+          prefix = '●', -- (or ▎ or ■ or x)
+        },
+        severity_sort = true,
+        float = {
+          source = "always",
+          border = "rounded",
+          header = "",
+          prefix = "",
+        },
+      })
+
+      -- Diagnostic keymaps
+      vim.keymap.set('n', '<leader>do', vim.diagnostic.open_float, { desc = "Show diagnostic in float" })
+      vim.keymap.set('n', '<leader>d[', vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
+      vim.keymap.set('n', '<leader>d]', vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+      vim.keymap.set('n', '<leader>dd', "<cmd>Telescope diagnostics<CR>", { desc = "Telescope diagnostics" })
+      -- If you don't want Telescope, use loclist:
+      -- vim.keymap.set('n', '<leader>dd', vim.diagnostic.setloclist, { desc = "Set loclist with diagnostics" })
+  '';
   };
 }

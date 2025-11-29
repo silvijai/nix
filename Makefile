@@ -17,7 +17,7 @@ help:
 # macOS
 darwin:
 	@echo "Rebuilding macOS configuration..."
-	darwin-rebuild switch --flake .#Viliuss-MacBook-Pro
+	sudo darwin-rebuild switch --flake .#Viliuss-MacBook-Pro
 
 darwin-test:
 	@echo "Testing macOS configuration (no switch)..."

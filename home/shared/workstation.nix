@@ -50,10 +50,10 @@ in
       term = "kitty";
     }
     (lib.mkIf pkgs.stdenv.isDarwin {
-      update = lib.mkDefault "darwin-rebuild switch --flake /Users/viliusi/nix";
+      update = lib.mkDefault "darwin-rebuild switch --flake /Users/silvija/nix";
     })
     (lib.mkIf pkgs.stdenv.isLinux {
-      update = lib.mkDefault "sudo nixos-rebuild switch --flake /home/viliusi/nix#linux-laptop";
+      update = lib.mkDefault "sudo nixos-rebuild switch --flake /home/silvija/nix#linux-laptop";
       
       # Clipboard (Wayland)
       pbcopy = "wl-copy";
