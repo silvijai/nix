@@ -9,8 +9,6 @@
     # Creative/Media - VERIFIED aarch64-darwin support
     inkscape
     audacity
-
-    ollama
   ];
 
   # macOS: Prefer Homebrew casks (better integration)
@@ -29,7 +27,8 @@
     "openmtp"
     "fuse-t"
     "macs-fan-control"
-    
+    "hiddenbar" 
+
     # Browsers
     "zen"
     "min"
@@ -46,6 +45,7 @@
     "github"
     "utm"
     "kitty"
+    "vscodium"
     
     # Creative Suite
     "affinity-designer"
@@ -94,6 +94,7 @@
     
     # AI
     "anythingllm"
+    "ollama"
     
     # Entertainment
     "spotify"
@@ -104,6 +105,8 @@
     # Browsers
     firefox
     chromium
+
+    ollama
     
     # Creative - Linux full support
     blender
@@ -140,6 +143,7 @@
     gnome-disk-utility
     android-file-transfer
     cryptomator
+    github-desktop
     
     # Wayland tools
     wl-clipboard

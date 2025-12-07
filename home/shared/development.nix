@@ -10,11 +10,11 @@
 
     # JavaScript/TypeScript
     nodejs_24
-    corepack
     nodePackages.eslint
     nodePackages.prettier
     nodePackages.typescript
     nodePackages.typescript-language-server
+    bun
 
     # Rust
     rustup

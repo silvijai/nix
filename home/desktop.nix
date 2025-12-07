@@ -30,7 +30,7 @@
       ];
 
       input = {
-        kb_layout = "us";
+        kb_layout = "dk";
         follow_mouse = 1;
         touchpad = {
           natural_scroll = true;

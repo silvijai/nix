@@ -22,8 +22,9 @@
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     # Use lib.mkBefore for init code
-    initExtra = lib.mkBefore ''
+    initContent = lib.mkBefore ''
       export EDITOR=nvim
+      eval "$(/opt/homebrew/bin/brew shellenv)"
     '';
   };
 

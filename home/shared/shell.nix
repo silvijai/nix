@@ -23,7 +23,7 @@
       dots = "cd ~/nix";
     };
 
-    initExtra = lib.mkAfter ''
+    initContent = lib.mkAfter ''
       HISTSIZE=10000
       SAVEHIST=10000
       setopt SHARE_HISTORY

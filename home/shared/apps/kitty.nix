@@ -11,7 +11,7 @@
     };
     
     settings = {
-      window_padding_width = 10;
+      window_padding_width = 5;
       background_opacity = "0.95";
       cursor_shape = "beam";
       cursor_blink_interval = 0;

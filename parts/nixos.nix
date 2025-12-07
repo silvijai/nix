@@ -44,7 +44,7 @@ in
       system = "x86_64-linux";
       modules = [ ../modules/desktop.nix ];
       homeModule = ../home/desktop.nix;
-      user = "viliusi";
+      user = "silvija";
     };
 
     # aarch64 UTM VM (Apple Silicon)
@@ -53,7 +53,7 @@ in
       system = "x86_64-linux";
       modules = [ ../modules/desktop.nix ];
       homeModule = ../home/desktop.nix;
-      user = "viliusi";
+      user = "silvija";
     };
   };
 }

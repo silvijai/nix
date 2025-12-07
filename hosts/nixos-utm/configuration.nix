@@ -23,7 +23,7 @@
   };
 
   # User configuration
-  users.users.viliusi = {
+  users.users.silvija = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];
     password = "nixos";  # Change this!

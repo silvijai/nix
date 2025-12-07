@@ -37,7 +37,6 @@ in
     masApps = {
       "Amphetamine" = 937984704;
       "Week Number" = 6502579523;
-      "Hidden Bar" = 1452453066;
       "Pure Paste" = 1611378436;
       "Displaperture" = 1543920362;
       "Command X" = 6448461551;
@@ -94,7 +93,7 @@ in
     env = pkgs.buildEnv {
       name = "system-applications";
       paths = config.environment.systemPackages;
-      pathsToLink = "/Applications";
+      pathsToLink = [ "/Applications" ];
     };
   in
     lib.mkForce ''

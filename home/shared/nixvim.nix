@@ -117,28 +117,39 @@
         settings = {
           provider = "ollama";
           
+          # Disable auto-suggestions to save resources
+          behaviour = {
+            auto_suggestions = false;
+            auto_set_highlight_group = true;
+            auto_set_keymaps = true;
+            auto_add_current_file = true;
+          };
+
           providers = {
             ollama = {
               endpoint = "http://127.0.0.1:11434";
-              model = "qwen2.5-coder:3b";
-              timeout = 60000;
+              model = "qwen2.5-coder:7b";
+              
+              # Timeout: 5 minutes (Local models can be slow)
+              timeout = 300000; 
+
               extra_request_body = {
+                # OLLAMA OPTIONS
                 options = {
-                  temperature = 0.7;
-                  num_ctx = 8192;
+                  # Safety Limit: 4096 tokens (~6GB VRAM usage). 
+                  # Do NOT raise this unless you close your browsers.
+                  num_ctx = 4096; 
+                  
+                  # Robot Mode: strict adherence to instructions
+                  temperature = 0.0;
+                  
+                  # Stop it from rambling endlessly
                   num_predict = 2048;
                 };
               };
             };
           };
-          
-          behaviour = {
-            auto_suggestions = false;
-            auto_set_highlight_group = false;
-            auto_set_keymaps = true;
-            auto_add_current_file = true;  # Automatically add current file
-          };
-          
+
           # Configure file selector
           selector = {
             provider = "telescope";  # Use telescope for better file selection
