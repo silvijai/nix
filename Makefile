@@ -1,100 +1,75 @@
-.PHONY: help darwin nixos-server nixos-laptop vm check update clean fmt
+.PHONY: help darwin nixos-server nixos-laptop nixos-asahi vm check update clean
 
-# Default target
 help:
-	@echo "MAID Nix Configuration Management"
-	@echo ""
 	@echo "Available targets:"
-	@echo "  make darwin         - Build and switch macOS configuration"
-	@echo "  make nixos-server   - Deploy to NixOS server (remote)"
-	@echo "  make nixos-laptop   - Build NixOS laptop configuration"
-	@echo "  make vm             - Build and run NixOS VM in UTM"
-	@echo "  make check          - Check flake validity"
-	@echo "  make update         - Update flake inputs"
-	@echo "  make fmt            - Format all nix files"
-	@echo "  make clean          - Clean build artifacts and old generations"
+	@echo "  darwin              - Build macOS"
+	@echo "  darwin-test         - Test macOS build"
+	@echo "  nixos-server        - Deploy server"
+	@echo "  nixos-laptop        - Build laptop"
+	@echo "  nixos-laptop-test   - Test laptop build"
+	@echo "  nixos-asahi         - Build Asahi"
+	@echo "  nixos-asahi-test    - Test Asahi build"
+	@echo "  asahi-test-from-macos - Cross-compile test from macOS"
+	@echo "  check               - Check flake"
+	@echo "  update              - Update inputs"
+	@echo "  clean               - Clean garbage"
 
 # macOS
 darwin:
-	@echo "Rebuilding macOS configuration..."
 	sudo darwin-rebuild switch --flake .#Viliuss-MacBook-Pro
 
 darwin-test:
-	@echo "Testing macOS configuration (no switch)..."
 	darwin-rebuild build --flake .#Viliuss-MacBook-Pro
 
-# NixOS Server (deploy from Mac)
+# NixOS Server
 nixos-server:
-	@echo "Deploying to NixOS server..."
 	nixos-rebuild switch --flake .#nixos-server \
 		--target-host maid-server \
 		--use-remote-sudo \
 		--build-host localhost
 
-nixos-server-test:
-	@echo "Testing server configuration..."
-	nixos-rebuild build --flake .#nixos-server
-
 # NixOS Laptop
 nixos-laptop:
-	@echo "Building NixOS laptop configuration..."
 	sudo nixos-rebuild switch --flake .#linux-laptop
 
-# VM for testing
+nixos-laptop-test:
+	nixos-rebuild build --flake .#linux-laptop
+
+# NixOS Asahi
+nixos-asahi:
+	sudo nixos-rebuild switch --flake .#asahi-macbook
+
+nixos-asahi-test:
+	nixos-rebuild build --flake .#asahi-macbook
+
+asahi-test-from-macos:
+	nix build .#nixosConfigurations.asahi-macbook.config.system.build.toplevel
+
+asahi-setup-cache:
+	@if ! grep -q "nixos-apple-silicon.cachix.org" /etc/nix/nix.conf 2>/dev/null; then \
+		echo "substituters = https://cache.nixos.org https://nixos-apple-silicon.cachix.org" | sudo tee -a /etc/nix/nix.conf; \
+		echo "trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nixos-apple-silicon.cachix.org-1:fVbPuKGzmcq4oCNq4WYJ6fXQOBLnJZGN+kLJ4RbBBFs=" | sudo tee -a /etc/nix/nix.conf; \
+	fi
+
+# VM
 vm:
-	@echo "Building NixOS VM..."
-	nix build .#nixosConfigurations.nixos-vm.config.system.build.vm
-	@echo "VM built! Run with: ./result/bin/run-nixos-vm"
+	nix build .#nixosConfigurations.nixos-utm.config.system.build.vm
 
 vm-run: vm
-	@echo "Starting VM..."
-	./result/bin/run-nixos-vm
+	./result/bin/run-nixos-utm
 
 # Maintenance
 check:
-	@echo "Checking flake..."
 	nix flake check
 
 update:
-	@echo "Updating flake inputs..."
-	nix flake update	
-
-fmt:
-	@echo "Formatting nix files..."
-	nix fmt
+	nix flake update
 
 clean:
-	@echo "Cleaning up..."
 	nix-collect-garbage -d
 	@if [ "$$(uname)" = "Darwin" ]; then \
-		darwin-rebuild --list-generations | tail -5; \
-	fi
-
-# Show current system info
-info:
-	@echo "System Information"
-	@echo "--------------------"
-	@if [ "$$(uname)" = "Darwin" ]; then \
-		echo "System: macOS"; \
-		echo "Hostname: $$(hostname)"; \
-		echo "Generation: $$(darwin-rebuild --list-generations | tail -1)"; \
+		sudo nix-collect-garbage -d; \
 	else \
-		echo "System: NixOS"; \
-		echo "Hostname: $$(hostname)"; \
-		nixos-version; \
+		sudo nix-collect-garbage -d; \
 	fi
-	@echo ""
-	@echo "Flake inputs:"
-	@nix flake metadata --json | jq -r '.locks.nodes | to_entries[] | select(.key != "root") | "  \(.key): \(.value.locked.rev[0:7])"'
 
-# Git helpers
-commit:
-	@echo "Committing changes..."
-	git add .
-	git status
-	@read -p "Commit message: " msg; \
-	git commit -m "$$msg"
-
-sync: commit
-	@echo "Syncing with remote..."
-	git push

@@ -1,7 +1,7 @@
 { inputs, ... }:
 let
   # Helper function to create NixOS systems with flexible architecture
-  mkNixosSystem = { hostname, system ? "x86_64-linux", modules, homeModule, user }:
+  mkNixosSystem = { hostname, system ? "x86_64-linux", modules, homeModule, user, isAsahi ? false }:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;  # Use the system parameter instead of hardcoding
       
@@ -54,6 +54,16 @@ in
       modules = [ ../modules/desktop.nix ];
       homeModule = ../home/desktop.nix;
       user = "silvija";
+    };
+
+    # M1 MacBook Pro (Asahi Linux)
+    asahi-macbook = mkNixosSystem {
+      hostname = "asahi-macbook";
+      system = "aarch64-linux";  # ← Important!
+      modules = [ ../modules/desktop.nix ../modules/asahi.nix ];
+      homeModule = ../home/desktop.nix;
+      user = "silvija";
+      isAsahi = true;  # ← Enables Apple Silicon support
     };
   };
 }

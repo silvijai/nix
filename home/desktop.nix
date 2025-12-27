@@ -9,9 +9,9 @@
   home.username = "silvija";
   home.homeDirectory = "/home/silvija";
 
-  # Override update alias
+  # Universal update alias (works on any NixOS system)
   programs.zsh.shellAliases = {
-    update = lib.mkForce "sudo nixos-rebuild switch --flake /home/viliusi/nix#linux-laptop";
+    update = "sudo nixos-rebuild switch --flake ~/nix#$(hostname)";
   };
 
   # Hyprland configuration (Wayland)

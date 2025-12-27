@@ -1,5 +1,5 @@
 {
-  description = "MAID - Multi-system configuration with flake-parts";
+  description = "Silvija's unified Nix configuration";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -11,6 +11,11 @@
     
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    apple-silicon = {
+      url = "github:tpwrules/nixos-apple-silicon";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     
@@ -25,7 +30,7 @@
     };
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = inputs@{ flake-parts, nix-darwin, apple-silicon, home-manager, nixvim, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ 
         "aarch64-darwin"
