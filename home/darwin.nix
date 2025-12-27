@@ -59,6 +59,18 @@ in {
       ensure_symlink "Music"
       ensure_symlink "Pictures"
       ensure_symlink "Movies"
+      
+      # Create reverse symlink: SharedData/nix -> ~/nix
+      # This allows accessing your nix config from SharedData
+      if [ -d "$HOME/nix" ] && [ ! -e "$SHARED_PATH/nix" ]; then
+        echo "  ✓ Creating SharedData/nix → ~/nix symlink"
+        $DRY_RUN_CMD ln -sfn "$HOME/nix" "$SHARED_PATH/nix"
+      elif [ -L "$SHARED_PATH/nix" ] && [ "$(readlink "$SHARED_PATH/nix")" = "$HOME/nix" ]; then
+        echo "  ✓ SharedData/nix symlink already exists"
+      elif [ -e "$SHARED_PATH/nix" ] && [ ! -L "$SHARED_PATH/nix" ]; then
+        echo "  ⚠ /Volumes/shared/nix exists but is not a symlink"
+        echo "    Move it back: mv /Volumes/shared/nix ~/nix && ln -s ~/nix /Volumes/shared/nix"
+      fi
     else
       echo "⚠ SharedData not mounted at $SHARED_PATH"
     fi
