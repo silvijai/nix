@@ -57,9 +57,7 @@ check:
 
 update:
 	@echo "Updating flake inputs..."
-	nix flake update
-	git add flake.lock
-	git diff --cached flake.lock
+	nix flake update	
 
 fmt:
 	@echo "Formatting nix files..."

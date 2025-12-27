@@ -9,6 +9,8 @@
     # Creative/Media - VERIFIED aarch64-darwin support
     inkscape
     audacity
+
+    sioyek
   ];
 
   # macOS: Prefer Homebrew casks (better integration)
@@ -79,6 +81,8 @@
     "deepl"
     "ticktick"
     "browserosaurus"
+    "thunderbird"
+    "proton-mail-bridge"
     
     # Security/Privacy
     "protonvpn"

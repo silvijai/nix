@@ -86,7 +86,7 @@ in
   security.pam.services.sudo_local.touchIdAuth = true;
 
   # State version
-  system.stateVersion = 4;
+  system.stateVersion = 4; 
 
   # App aliases
   system.activationScripts.applications.text = let

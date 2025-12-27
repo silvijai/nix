@@ -11,7 +11,7 @@
     };
     
     settings = {
-      window_padding_width = 5;
+      window_padding_width = 2;
       background_opacity = "0.95";
       cursor_shape = "beam";
       cursor_blink_interval = 0;
@@ -23,6 +23,8 @@
       tab_bar_style = "powerline";
       tab_bar_edge = "top";
       
+      allow_remote_control = "yes";
+
       foreground = "#CDD6F4";
       background = "#1E1E2E";
       selection_foreground = "#1E1E2E";

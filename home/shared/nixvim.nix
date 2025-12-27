@@ -105,55 +105,96 @@
         lintersByFt = {
           javascript = ["eslint"];
           typescript = ["eslint"];
-          
         };
       };
 
       comment.enable = true;
       vim-surround.enable = true;
 
-      avante = {
+      # --- COPILOT CONFIGURATION (TOKEN-OPTIMIZED) ---
+
+      # 1. Base Copilot (Autocomplete DISABLED by default)
+      copilot-lua = {
         enable = true;
         settings = {
-          provider = "ollama";
-          
-          # Disable auto-suggestions to save resources
-          behaviour = {
-            auto_suggestions = false;
-            auto_set_highlight_group = true;
-            auto_set_keymaps = true;
-            auto_add_current_file = true;
-          };
-
-          providers = {
-            ollama = {
-              endpoint = "http://127.0.0.1:11434";
-              model = "qwen2.5-coder:7b";
-              
-              # Timeout: 5 minutes (Local models can be slow)
-              timeout = 300000; 
-
-              extra_request_body = {
-                # OLLAMA OPTIONS
-                options = {
-                  # Safety Limit: 4096 tokens (~6GB VRAM usage). 
-                  # Do NOT raise this unless you close your browsers.
-                  num_ctx = 4096; 
-                  
-                  # Robot Mode: strict adherence to instructions
-                  temperature = 0.0;
-                  
-                  # Stop it from rambling endlessly
-                  num_predict = 2048;
-                };
-              };
+          suggestion = {
+            enabled = true;
+            auto_trigger = false; # Disabled: manually trigger with <M-]> or toggle command
+            debounce = 75;
+            keymap = {
+              accept = "<C-y>";      # Accept suggestion
+              next = "<M-]>";        # Manually trigger/cycle next
+              prev = "<M-[>";        # Cycle previous
+              dismiss = "<C-e>";     # Dismiss
             };
           };
-
-          # Configure file selector
-          selector = {
-            provider = "telescope";  # Use telescope for better file selection
+          panel = { enabled = false; };
+          filetypes = {
+            # Disable for non-code files to save tokens
+            markdown = false;
+            text = false;
+            gitcommit = false;
+            gitrebase = false;
+            yaml = false;
           };
+        };
+      };
+
+      # 2. Copilot Chat (Token-optimized without system_prompt)
+      copilot-chat = {
+        enable = true;
+        settings = {
+          # UI Settings
+          window = {
+            layout = "vertical";
+            width = 0.3;
+          };
+          
+          # Custom prompts for token-saving behavior
+          prompts = {
+            # Override default prompts to be more concise
+            Explain = {
+              prompt = "/COPILOT_EXPLAIN Explain this code in 3-4 sentences. Focus on key concepts only.";
+            };
+            
+            Review = {
+              prompt = "Review this code for issues. List problems but do NOT provide fixed code.";
+            };
+            
+            Fix = {
+              prompt = "Identify the bug and suggest a fix approach. Provide only the minimal changed lines, not the full code.";
+            };
+            
+            Optimize = {
+              prompt = "Suggest optimization approaches. Explain the strategy, don't rewrite everything.";
+            };
+            
+            Docs = {
+              prompt = "Add concise documentation comments. Follow language conventions.";
+            };
+            
+            Tests = {
+              prompt = "Suggest test cases to write. List scenarios, not full test code.";
+            };
+            
+            # Custom: Get guidance without code
+            Approach = {
+              prompt = "Describe the algorithm or approach to solve this in pseudocode or plain English. Do not write actual code.";
+            };
+            
+            # Custom: When you actually need full code (use sparingly)
+            Implement = {
+              prompt = "Write the complete, production-ready implementation.";
+            };
+          };
+          
+          question_header = "## User ";
+          answer_header = "## Copilot ";
+          error_header = "## Error ";
+          
+          auto_follow_cursor = false;
+          show_help = false;
+          auto_insert_mode = false;
         };
       };
     };
@@ -162,16 +203,24 @@
       # Explorer
       { mode = "n"; key = "<C-n>"; action = ":Neotree toggle<CR>"; options.desc = "Toggle Explorer"; }
       
-      # Avante chat
-      { mode = "n"; key = "<leader>aa"; action = ":AvanteAsk<CR>"; options.desc = "Avante Ask"; }
-      { mode = "v"; key = "<leader>aa"; action = ":AvanteAsk<CR>"; options.desc = "Avante Ask"; }
-      { mode = "n"; key = "<leader>ar"; action = ":AvanteRefresh<CR>"; options.desc = "Avante Refresh"; }
-      { mode = "n"; key = "<leader>at"; action = ":AvanteToggle<CR>"; options.desc = "Avante Toggle"; }
-      { mode = "n"; key = "<leader>af"; action = ":AvanteFocus<CR>"; options.desc = "Avante Focus"; }
+      # --- Copilot Chat Keymaps ---
+      { mode = "n"; key = "<leader>aa"; action = ":CopilotChatToggle<CR>"; options.desc = "Toggle Copilot Chat"; }
+      { mode = "v"; key = "<leader>aa"; action = ":CopilotChatToggle<CR>"; options.desc = "Toggle Copilot Chat"; }
+      { mode = "n"; key = "<leader>ar"; action = ":CopilotChatReset<CR>"; options.desc = "Reset Chat"; }
+      { mode = "n"; key = "<leader>at"; action = ":CopilotChatToggle<CR>"; options.desc = "Toggle Chat"; }
       
-      # Avante file management (ADDED)
-      { mode = "n"; key = "<leader>ac"; action = "<cmd>lua require('avante.api').add_current_file()<CR>"; options.desc = "Add Current File"; }
-      { mode = "n"; key = "<leader>aB"; action = "<cmd>lua require('avante.api').add_all_buffers()<CR>"; options.desc = "Add All Buffers"; }
+      # Explanation & guidance (token-efficient)
+      { mode = "n"; key = "<leader>ae"; action = ":CopilotChatExplain<CR>"; options.desc = "Explain Code"; }
+      { mode = "v"; key = "<leader>ae"; action = ":CopilotChatExplain<CR>"; options.desc = "Explain Code"; }
+      { mode = "n"; key = "<leader>ap"; action = ":CopilotChatApproach<CR>"; options.desc = "Get Approach"; }
+      { mode = "v"; key = "<leader>ap"; action = ":CopilotChatApproach<CR>"; options.desc = "Get Approach"; }
+      
+      # Code generation (higher token usage - use sparingly)
+      { mode = "n"; key = "<leader>ai"; action = ":CopilotChatImplement<CR>"; options.desc = "Implement (Full Code)"; }
+      { mode = "v"; key = "<leader>ai"; action = ":CopilotChatImplement<CR>"; options.desc = "Implement (Full Code)"; }
+      
+      # Toggle autocomplete
+      { mode = "n"; key = "<leader>uc"; action = ":ToggleCopilot<CR>"; options.desc = "Toggle Copilot Autocomplete"; }
       
       # Window navigation
       { mode = "n"; key = "<C-h>"; action = "<C-w>h"; }
@@ -187,8 +236,8 @@
     colorschemes.catppuccin.enable = true;
 
     extraConfigLua = ''
-      -- Minimalist diagnostic icons (nerd font recommended)
-      local signs = { Error = "", Warn = "", Hint = "󰛩", Info = "" }
+      -- Minimalist diagnostic icons
+      local signs = { Error = "", Warn = "", Hint = "󰛩", Info = "" }
       for type, icon in pairs(signs) do
         local hl = "DiagnosticSign" .. type
         vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
@@ -197,7 +246,7 @@
       -- Diagnostic display config
       vim.diagnostic.config({
         virtual_text = {
-          prefix = '●', -- (or ▎ or ■ or x)
+          prefix = '●',
         },
         severity_sort = true,
         float = {
@@ -209,12 +258,35 @@
       })
 
       -- Diagnostic keymaps
-      vim.keymap.set('n', '<leader>do', vim.diagnostic.open_float, { desc = "Show diagnostic in float" })
+      vim.keymap.set('n', '<leader>do', vim.diagnostic.open_float, { desc = "Show diagnostic" })
       vim.keymap.set('n', '<leader>d[', vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
       vim.keymap.set('n', '<leader>d]', vim.diagnostic.goto_next, { desc = "Next diagnostic" })
-      vim.keymap.set('n', '<leader>dd', "<cmd>Telescope diagnostics<CR>", { desc = "Telescope diagnostics" })
-      -- If you don't want Telescope, use loclist:
-      -- vim.keymap.set('n', '<leader>dd', vim.diagnostic.setloclist, { desc = "Set loclist with diagnostics" })
-  '';
+      vim.keymap.set('n', '<leader>dd', "<cmd>Telescope diagnostics<CR>", { desc = "Diagnostics" })
+
+      -- Toggle Copilot Autocomplete Command
+      vim.api.nvim_create_user_command('ToggleCopilot', function()
+        local copilot_suggestion = require("copilot.suggestion")
+        if copilot_suggestion.is_visible() then
+          copilot_suggestion.dismiss()
+        end
+        
+        -- Toggle auto_trigger setting
+        local current = vim.g.copilot_auto_trigger
+        if current == nil then
+          current = false -- default from config
+        end
+        
+        vim.g.copilot_auto_trigger = not current
+        
+        if vim.g.copilot_auto_trigger then
+          -- Enable auto suggestions
+          vim.fn['copilot#Suggest']()
+          print("Copilot autocomplete: ENABLED")
+        else
+          print("Copilot autocomplete: DISABLED (use <M-]> to trigger manually)")
+        end
+      end, {})
+    '';
   };
 }
+

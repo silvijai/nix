@@ -45,7 +45,7 @@
         lib.maid = {
           users = {
             darwin = "silvija";
-            linux = "Silvia";
+            linux = "silvija";
             server = "MAID0";
           };
         };
