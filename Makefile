@@ -66,10 +66,20 @@ update:
 	nix flake update
 
 clean:
+	@echo "Cleaning up..."
 	nix-collect-garbage -d
+	sudo nix-collect-garbage -d
 	@if [ "$$(uname)" = "Darwin" ]; then \
-		sudo nix-collect-garbage -d; \
+		echo "Cleaning Homebrew..."; \
+		brew cleanup -s || true; \
+		brew autoremove || true; \
+		echo "Cleaning old Darwin generations..."; \
+		sudo nix-env --delete-generations old --profile /nix/var/nix/profiles/system || true; \
+		echo "Optimizing Nix store..."; \
+		nix store optimise; \
 	else \
+		echo "Cleaning old NixOS generations..."; \
 		sudo nix-collect-garbage -d; \
+		nix store optimise; \
 	fi
-
+	@echo "Done!"

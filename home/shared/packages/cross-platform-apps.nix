@@ -1,19 +1,132 @@
 { pkgs, lib, ... }:
+let
+  isAarch64 = pkgs.stdenv.hostPlatform.isAarch64;
+  isX86_64 = pkgs.stdenv.hostPlatform.isx86_64;
+in
 {
-  # Apps available via Nix on BOTH macOS (aarch64-darwin) AND Linux
-  # ONLY packages verified to work on Apple Silicon
+  # Apps that work on ALL platforms (macOS + Linux, x86 + ARM)
   both = with pkgs; [
-    # Development tools
     git
-    
-    # Creative/Media - VERIFIED aarch64-darwin support
     inkscape
     audacity
-
     sioyek
   ];
 
-  # macOS: Prefer Homebrew casks (better integration)
+  # Linux-only packages (architecture-aware)
+  linuxNix = with pkgs; [
+    # Browsers (all have ARM support)
+    firefox
+    chromium
+
+    # Communication
+    vesktop
+    
+    # Productivity
+    obsidian
+    anki
+    libreoffice
+    
+    # Creative (ARM-native)
+    blender
+    krita
+    obs-studio
+    musescore
+    vlc
+    gimp
+    
+    # Media utilities
+    handbrake
+    
+    # VPN
+    protonvpn-gui
+    
+    # System utilities
+    gparted
+    gnome-disk-utility
+    android-file-transfer
+    
+    # Wayland tools
+    wl-clipboard
+    wev
+    wlr-randr
+    kanshi
+    
+    # Screenshots
+    grim
+    slurp
+    swappy
+    wf-recorder
+
+    # compatability layers
+    box64
+    qemu
+  ] 
+  # x86-only packages (excluded on ARM)
+  ++ lib.optionals isX86_64 [
+    steam
+    heroic
+    lutris
+    wine
+    winetricks
+    makemkv
+    cryptomator
+    github-desktop
+  ]
+  # ARM-specific alternatives
+  ++ lib.optionals isAarch64 [
+    # Native ARM gaming (if needed)
+    # Add ARM-native game launchers here
+  ];
+
+  # Flatpak apps (Linux only)
+  linuxFlatpak = [
+    "io.github.zen_browser.zen"
+    "com.discordapp.Discord"
+    "com.slack.Slack"
+    "com.spotify.Client"
+    "md.obsidian.Obsidian"
+    "org.blender.Blender"
+    "com.obsproject.Studio"
+    "org.kde.krita"
+
+    "com.valvesoftware.Steam"
+    "com.heroicgameslauncher.hgl"
+
+    "org.cryptomator.Cryptomator"
+    "io.github.shiftey.Desktop"
+  ];
+
+  # Flatpak install script
+  flatpakInstallScript = pkgs.writeShellScriptBin "flatpak-install" ''
+    #!/usr/bin/env bash
+    set -e
+    
+    echo "Installing Flatpak applications..."
+    
+    if ! flatpak remote-list | grep -q flathub; then
+      echo "Adding Flathub repository..."
+      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    fi
+    
+    flatpak install -y flathub io.github.zen_browser.zen || true
+    flatpak install -y flathub com.discordapp.Discord || true
+    flatpak install -y flathub com.slack.Slack || true
+    flatpak install -y flathub com.spotify.Client || true
+    flatpak install -y flathub md.obsidian.Obsidian || true
+    flatpak install -y flathub org.blender.Blender || true
+    flatpak install -y flathub com.obsproject.Studio || true
+    flatpak install -y flathub org.kde.krita || true
+
+    flatpak install -y flathub com.valvesoftware.Steam || true
+    flatpak install -y flathub com.heroicgameslauncher.hgl || true
+
+    flatpak install -y flathub org.cryptomator.Cryptomator || true
+    flatpak install -y flathub io.github.shiftey.Desktop || true
+    
+    echo "Done!"
+  '';
+
+  # macOS Homebrew casks (not used in this file, but kept for reference)
   macosPreferCask = [
     # Window Management
     "raycast"
@@ -103,98 +216,4 @@
     # Entertainment
     "spotify"
   ];
-
-  # Linux: Additional Nix packages
-  linuxNix = with pkgs; [
-    # Browsers
-    firefox
-    chromium
-
-    ollama
-    
-    # Creative - Linux full support
-    blender
-    krita
-    obs-studio
-    musescore
-    vlc
-    gimp
-    
-    # Communication
-    vesktop
-    
-    # Productivity
-    obsidian
-    anki
-    libreoffice
-    
-    # Media utilities
-    makemkv
-    handbrake
-    
-    # Gaming
-    steam
-    heroic
-    lutris
-    wine
-    winetricks
-    
-    # VPN
-    protonvpn-gui
-    
-    # System utilities
-    gparted
-    gnome-disk-utility
-    android-file-transfer
-    cryptomator
-    github-desktop
-    
-    # Wayland tools
-    wl-clipboard
-    wev
-    wlr-randr
-    kanshi
-    
-    # Screenshots/recording
-    grim
-    slurp
-    swappy
-    wf-recorder
-  ];
-
-  # Flatpak apps (Linux only)
-  linuxFlatpak = [
-    "io.github.zen_browser.zen"
-    "com.discordapp.Discord"
-    "com.slack.Slack"
-    "com.spotify.Client"
-    "md.obsidian.Obsidian"
-    "org.blender.Blender"
-    "com.obsproject.Studio"
-    "org.kde.krita"
-  ];
-
-  # Flatpak installation script
-  flatpakInstallScript = pkgs.writeShellScriptBin "flatpak-install" ''
-    #!/usr/bin/env bash
-    set -e
-    
-    echo "📦 Installing Flatpak applications..."
-    
-    if ! flatpak remote-list | grep -q flathub; then
-      echo "Adding Flathub repository..."
-      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    fi
-    
-    flatpak install -y flathub io.github.zen_browser.zen || true
-    flatpak install -y flathub com.discordapp.Discord || true
-    flatpak install -y flathub com.slack.Slack || true
-    flatpak install -y flathub com.spotify.Client || true
-    flatpak install -y flathub md.obsidian.Obsidian || true
-    flatpak install -y flathub org.blender.Blender || true
-    flatpak install -y flathub com.obsproject.Studio || true
-    flatpak install -y flathub org.kde.krita || true
-    
-    echo "✅ Done!"
-  '';
 }

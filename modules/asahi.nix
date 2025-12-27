@@ -7,49 +7,45 @@
   # Apple Silicon hardware support
   hardware.asahi = {
     enable = true;
-    useExperimentalGPUDriver = true;
-    experimentalGPUInstallMode = "replace";
     setupAsahiSound = true;
     
-    # Use firmware from local directory (flake-compatible)
-    peripheralFirmwareDirectory = ../../firmware;
-    extractPeripheralFirmware = true;
+    # Only extract firmware if the directory exists (during actual installation)
+    extractPeripheralFirmware = lib.mkDefault (builtins.pathExists ../../firmware);
+    peripheralFirmwareDirectory = lib.mkIf (builtins.pathExists ../../firmware) ../../firmware;
   };
 
-  # Binary cache configuration
+  # Binary cache
   nix.settings = {
     substituters = [
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
-      "https://nixos-apple-silicon.cachix.org"  # ← Apple Silicon cache
+      "https://nixos-apple-silicon.cachix.org"
     ];
     trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "nixos-apple-silicon.cachix.org-1:fVbPuKGzmcq4oCNq4WYJ6fXQOBLnJZGN+kLJ4RbBBFs="  # ← Apple Silicon key
+      "nixos-apple-silicon.cachix.org-1:fVbPuKGzmcq4oCNq4WYJ6fXQOBLnJZGN+kLJ4RbBBFs="
     ];
   };
 
-  # Asahi-specific kernel
+  # Kernel
   boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_asahi;
-
-  # Preserve notch area
   boot.kernelParams = [ "apple_dcp.show_notch=1" ];
+  boot.extraModprobeConfig = ''
+    options hid_apple iso_layout=0
+  '';
 
-  # Graphics for Wayland
+  # Graphics (GPU support is now in mainline Mesa)
   services.xserver.videoDrivers = [ "modesetting" ];
 
-  # WiFi (recommended for Asahi)
+  # WiFi
   networking.wireless.iwd = {
     enable = true;
     settings.General.EnableNetworkConfiguration = true;
   };
-
-  # Disable NetworkManager if using iwd
   networking.networkmanager.enable = lib.mkForce false;
-  networking.networkmanager.wifi.backend = "iwd";
 
-  # Touchpad (Mac-style)
+  # Touchpad
   services.libinput = {
     enable = true;
     touchpad = {
@@ -61,7 +57,7 @@
     };
   };
 
-  # Power management (disable TLP, conflicts with Asahi)
+  # Power
   services.tlp.enable = lib.mkForce false;
   powerManagement = {
     enable = true;

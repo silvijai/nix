@@ -1,19 +1,19 @@
 { inputs, ... }:
 let
-  # Helper function to create NixOS systems with flexible architecture
   mkNixosSystem = { hostname, system ? "x86_64-linux", modules, homeModule, user, isAsahi ? false }:
     inputs.nixpkgs.lib.nixosSystem {
-      inherit system;  # Use the system parameter instead of hardcoding
+      inherit system;
       
       modules = [
-        # Allow unfree packages
-        { nixpkgs.config.allowUnfree = true; } 
+        { nixpkgs.config.allowUnfree = true; }
+        { networking.hostName = hostname; }
         
-        # Host-specific configuration
         ../hosts/${hostname}/configuration.nix
         ../modules/nixos-common.nix
       ] ++ modules ++ [
-        # Home Manager integration
+        # Add Apple Silicon support if Asahi
+        (if isAsahi then inputs.apple-silicon.nixosModules.apple-silicon-support else {})
+        
         inputs.home-manager.nixosModules.home-manager {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
@@ -29,7 +29,6 @@ let
 in
 {
   flake.nixosConfigurations = {
-    # x86_64 server
     nixos-server = mkNixosSystem {
       hostname = "nixos-server";
       system = "x86_64-linux";
@@ -38,7 +37,6 @@ in
       user = "MAID0";
     };
     
-    # x86_64 laptop
     linux-laptop = mkNixosSystem {
       hostname = "linux-laptop";
       system = "x86_64-linux";
@@ -47,23 +45,22 @@ in
       user = "silvija";
     };
 
-    # aarch64 UTM VM (Apple Silicon)
     nixos-utm = mkNixosSystem {
       hostname = "nixos-utm";
-      system = "x86_64-linux";
+      system = "aarch64-linux";
       modules = [ ../modules/desktop.nix ];
       homeModule = ../home/desktop.nix;
       user = "silvija";
     };
 
-    # M1 MacBook Pro (Asahi Linux)
     asahi-macbook = mkNixosSystem {
       hostname = "asahi-macbook";
-      system = "aarch64-linux";  # ← Important!
+      system = "aarch64-linux";
       modules = [ ../modules/desktop.nix ../modules/asahi.nix ];
-      homeModule = ../home/desktop.nix;
+      homeModule = ../home/desktop-asahi.nix;
       user = "silvija";
-      isAsahi = true;  # ← Enables Apple Silicon support
+      isAsahi = true;
     };
   };
 }
+
