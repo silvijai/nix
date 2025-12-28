@@ -177,7 +177,6 @@ in
     # Music Production
     "ableton-live-standard"
     "lmms"
-    "deelay"
     "supercollider"
     "surge-xt"
     
@@ -211,7 +210,7 @@ in
     
     # AI
     "anythingllm"
-    "ollama"
+    "ollama-app"
     
     # Entertainment
     "spotify"

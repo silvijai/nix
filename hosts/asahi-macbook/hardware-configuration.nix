@@ -2,6 +2,8 @@
 {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
+  boot.initrd.supportedFilesystems = [ "btrfs" ];
+
   boot = {
     initrd.availableKernelModules = [ "usb_storage" ];
     
@@ -26,7 +28,7 @@
   };
 
   fileSystems."/mnt/Shared" = {
-    device = "/dev/disk/by-label/shared";
+    device = "/dev/disk/by-label/Shared";
     fsType = "exfat";
     options = [ "nofail" "x-systemd.automount" "uid=1000" "gid=100" "umask=0022" ];
   };
