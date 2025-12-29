@@ -1,18 +1,20 @@
-.PHONY: help darwin nixos-server nixos-laptop nixos-asahi vm check update clean
+.PHONY: help darwin nixos-server nixos-laptop nixos-asahi fedora-asahi vm check update clean
 
 help:
 	@echo "Available targets:"
-	@echo "  darwin              - Build macOS"
-	@echo "  darwin-test         - Test macOS build"
-	@echo "  nixos-server        - Deploy server"
-	@echo "  nixos-laptop        - Build laptop"
-	@echo "  nixos-laptop-test   - Test laptop build"
-	@echo "  nixos-asahi         - Build Asahi"
-	@echo "  nixos-asahi-test    - Test Asahi build"
+	@echo "  darwin                - Build macOS"
+	@echo "  darwin-test           - Test macOS build"
+	@echo "  nixos-server          - Deploy server"
+	@echo "  nixos-laptop          - Build laptop"
+	@echo "  nixos-laptop-test     - Test laptop build"
+	@echo "  nixos-asahi           - Build NixOS Asahi (System)"
+	@echo "  nixos-asahi-test      - Test NixOS Asahi build"
+	@echo "  fedora-asahi          - Apply Fedora Asahi (Home Manager)"
+	@echo "  fedora-asahi-test     - Test Fedora Asahi build"
 	@echo "  asahi-test-from-macos - Cross-compile test from macOS"
-	@echo "  check               - Check flake"
-	@echo "  update              - Update inputs"
-	@echo "  clean               - Clean garbage"
+	@echo "  check                 - Check flake"
+	@echo "  update                - Update inputs"
+	@echo "  clean                 - Clean garbage"
 
 # macOS
 darwin:
@@ -41,6 +43,13 @@ nixos-asahi:
 
 nixos-asahi-test:
 	nixos-rebuild build --flake .#asahi-macbook
+
+# Fedora Asahi (Home Manager Standalone)
+fedora-asahi:
+	nix run home-manager -- switch --flake .#silvija@fedora-asahi
+
+fedora-asahi-test:
+	nix build .#homeConfigurations."silvija@fedora-asahi".activationPackage
 
 asahi-test-from-macos:
 	nix build .#nixosConfigurations.asahi-macbook.config.system.build.toplevel
@@ -78,8 +87,10 @@ clean:
 		echo "Optimizing Nix store..."; \
 		nix store optimise; \
 	else \
-		echo "Cleaning old NixOS generations..."; \
+		echo "Cleaning old NixOS/Home Manager generations..."; \
 		sudo nix-collect-garbage -d; \
+		nix-collect-garbage -d; \
 		nix store optimise; \
 	fi
 	@echo "Done!"
+

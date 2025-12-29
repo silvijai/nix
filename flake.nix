@@ -35,6 +35,7 @@
       systems = [ 
         "aarch64-darwin"
         "x86_64-linux"
+        "aarch65-linux"
       ];
 
       imports = [
@@ -43,6 +44,7 @@
         ./parts/home.nix
         ./parts/formatter.nix
         ./parts/devshells.nix
+        ./parts/fedora-asahi.nix
       ];
 
       # Allow unfree packages at flake level

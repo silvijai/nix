@@ -4,9 +4,7 @@
 
   boot.initrd.supportedFilesystems = [ "btrfs" ];
 
-  boot = {
-    initrd.availableKernelModules = [ "usb_storage" ];
-    
+  boot = { 
     loader = {
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = false;
