@@ -1,11 +1,23 @@
-{ config, ... }:
+{ config, pkgs, inputs, lib, ... }:
 {
-  imports = [ 
-    ./desktop.nix                      # Base desktop config
-    ./shared/asahi-shared-drive.nix    # SharedData XDG setup
+  imports = [
+    ./desktop.nix
+    ./shared/asahi-shared-drive.nix
+    ./flatpak.nix  # ✅ New declarative flatpak
   ];
 
-  # Any other Asahi-specific home-manager settings
-  # (currently nothing needed here, but keeps structure clean)
+  # Apps from cross-platform
+  home.packages = (import ../shared/packages/cross-platform-apps.nix { inherit pkgs lib; }).linuxNix;
+
+  # KDE Plasma integration
+  programs.plasma.enable = true;
+
+  # Sway session (optional alongside KDE)
+  wayland.windowManager.sway.enable = true;
+
+  # KDE Discover auto-refreshes Flatpaks
+  home.activation.kdeDiscover = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    ${pkgs.libsForQt5.kdeconnect}/bin/kdeconnect-cli --refresh || true
+  '';
 }
 

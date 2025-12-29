@@ -4,29 +4,38 @@ let
   isX86_64 = pkgs.stdenv.hostPlatform.isx86_64;
 in
 {
-  # Apps that work on ALL platforms (macOS + Linux, x86 + ARM)
+  # Universal apps (macOS + Linux)
   both = with pkgs; [
     git
+    ripgrep
+    fd
+    eza
+    bat
+    zoxide
+    fzf
+    tldr
+    neovim
     inkscape
     audacity
     sioyek
   ];
 
-  # Linux-only packages (architecture-aware)
+  # Native Nix packages (Linux)
   linuxNix = with pkgs; [
-    # Browsers (all have ARM support)
+    # Browsers
     firefox
-    chromium
-
+    (chromium.override { commandLineArgs = "--enable-features=VaapiVideoDecoder"; })
+    
     # Communication
     vesktop
+    element-desktop
     
     # Productivity
     obsidian
     anki
-    libreoffice
+    libreoffice-qt
     
-    # Creative (ARM-native)
+    # Creative (ARM optimized)
     blender
     krita
     obs-studio
@@ -34,97 +43,53 @@ in
     vlc
     gimp
     
-    # Media utilities
+    # Utilities
     handbrake
-    
-    # VPN
-    protonvpn-gui
-    
-    # System utilities
     gparted
     gnome-disk-utility
-    android-file-transfer
     
-    # Wayland tools
-    wl-clipboard
-    wev
-    wlr-randr
-    kanshi
+    # Wayland essentials
+    wl-clipboard wev wlr-randr kanshi grim slurp swappy wf-recorder
     
-    # Screenshots
-    grim
-    slurp
-    swappy
-    wf-recorder
-
-    # compatability layers
-    box64
+    # KDE integration
+    libsForQt5.plasma-browser-integration
+    libsForQt5.polkit-kde-agent
+    libsForQt5.spectacle  # KDE screenshot
+    libsForQt5.ark
+    
+    # Gaming/VM
+    box64 
     qemu
-  ] 
-  # x86-only packages (excluded on ARM)
-  ++ lib.optionals isX86_64 [
-    steam
-    heroic
-    lutris
-    wine
-    winetricks
-    makemkv
-    cryptomator
-    github-desktop
-  ]
-  # ARM-specific alternatives
-  ++ lib.optionals isAarch64 [
-    # Native ARM gaming (if needed)
-    # Add ARM-native game launchers here
+  ] ++ lib.optionals isX86_64 [
+    steam heroic lutris wine winetricks makemkv
   ];
 
-  # Flatpak apps (Linux only)
-  linuxFlatpak = [
+  # DECLARATIVE FLATPAK (Replaces script)
+  flatpaks = with lib; [
+    # Browsers
     "io.github.zen_browser.zen"
+    "org.librewolf.community"
+    
+    # Communication (KDE Discover optimized)
     "com.discordapp.Discord"
     "com.slack.Slack"
+    "org.telegram.desktop"
+    
+    # Media/Creative
     "com.spotify.Client"
-    "md.obsidian.Obsidian"
-    "org.blender.Blender"
     "com.obsproject.Studio"
+    "org.blender.Blender"
     "org.kde.krita"
-
+    
+    # Gaming
     "com.valvesoftware.Steam"
     "com.heroicgameslauncher.hgl"
-
+    
+    # Productivity
+    "md.obsidian.Obsidian"
     "org.cryptomator.Cryptomator"
     "io.github.shiftey.Desktop"
   ];
-
-  # Flatpak install script
-  flatpakInstallScript = pkgs.writeShellScriptBin "flatpak-install" ''
-    #!/usr/bin/env bash
-    set -e
-    
-    echo "Installing Flatpak applications..."
-    
-    if ! flatpak remote-list | grep -q flathub; then
-      echo "Adding Flathub repository..."
-      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    fi
-    
-    flatpak install -y flathub io.github.zen_browser.zen || true
-    flatpak install -y flathub com.discordapp.Discord || true
-    flatpak install -y flathub com.slack.Slack || true
-    flatpak install -y flathub com.spotify.Client || true
-    flatpak install -y flathub md.obsidian.Obsidian || true
-    flatpak install -y flathub org.blender.Blender || true
-    flatpak install -y flathub com.obsproject.Studio || true
-    flatpak install -y flathub org.kde.krita || true
-
-    flatpak install -y flathub com.valvesoftware.Steam || true
-    flatpak install -y flathub com.heroicgameslauncher.hgl || true
-
-    flatpak install -y flathub org.cryptomator.Cryptomator || true
-    flatpak install -y flathub io.github.shiftey.Desktop || true
-    
-    echo "Done!"
-  '';
 
   # macOS Homebrew casks (not used in this file, but kept for reference)
   macosPreferCask = [
