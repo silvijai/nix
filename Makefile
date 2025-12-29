@@ -46,10 +46,10 @@ nixos-asahi-test:
 
 # Fedora Asahi (Home Manager Standalone)
 fedora-asahi:
-	nix run home-manager -- switch --flake .#silvija@fedora-asahi
+	nix run home-manager -- switch --flake .#fedora-asahi
 
 fedora-asahi-test:
-	nix build .#homeConfigurations."silvija@fedora-asahi".activationPackage
+	nix build .#homeConfigurations."fedora-asahi".activationPackage
 
 asahi-test-from-macos:
 	nix build .#nixosConfigurations.asahi-macbook.config.system.build.toplevel

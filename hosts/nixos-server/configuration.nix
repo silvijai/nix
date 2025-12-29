@@ -13,7 +13,7 @@
 
   # static IP Adress
   networking = {
-    hostName = "nixos";
+    hostName = "nixos-server";
     useDHCP = false;
     interfaces.enp0s31f6 = {
       ipv4.addresses = [{
