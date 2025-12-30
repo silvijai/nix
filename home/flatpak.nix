@@ -1,6 +1,6 @@
 { inputs, pkgs, lib, ... }:
 {
-  imports = [ inputs.nix-flatpak.homeManagerModules.default ];
+  imports = [ inputs.nix-flatpak.homeManagerModules.nix-flatpak ];
 
   # Fully declarative Flatpaks
   services.flatpak = {

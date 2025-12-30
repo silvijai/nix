@@ -5,7 +5,7 @@
     extraSpecialArgs = { inherit inputs; };
     modules = [
       ../hosts/fedora-asahi/configuration.nix
-      inputs.nix-flatpak.homeManagerModules.default  # ✅ Declarative flatpak
+      # inputs.nix-flatpak.homeManagerModules.default
     ];
   };
 }
