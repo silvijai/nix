@@ -1,17 +1,13 @@
 { inputs, pkgs, lib, ... }:
 {
-  imports = [ inputs.nix-flatpak.homeManagerModules.nix-flatpak ];  # ✅ Correct path
+  imports = [ inputs.nix-flatpak.homeManagerModules.nix-flatpak ];
   
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-    config.common.default = "*";  # ✅ Fix warning
-  };
-
-  # Fully declarative Flatpaks
-  services.flatpak = {
+  xdg.portal.config.common.default = "*";
+  
+  services.flatpak = lib.mkIf pkgs.stdenv.isLinux {
     enable = true;
     packages = (import ../shared/packages/cross-platform-apps.nix { inherit pkgs lib; }).flatpaks;
   };
 }
+
 
