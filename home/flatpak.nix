@@ -6,8 +6,7 @@
   
   services.flatpak = lib.mkIf pkgs.stdenv.isLinux {
     enable = true;
-    packages = (import ../shared/packages/cross-platform-apps.nix { inherit pkgs lib; }).flatpaks;
+    packages = (import ./shared/packages/cross-platform-apps.nix { inherit pkgs lib; }).flatpaks;
   };
 }
-
 
