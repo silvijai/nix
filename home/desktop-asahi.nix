@@ -14,10 +14,5 @@
 
   # Sway session (optional alongside KDE)
   wayland.windowManager.sway.enable = true;
-
-  # KDE Discover auto-refreshes Flatpaks
-  home.activation.kdeDiscover = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    ${pkgs.libsForQt5.kdeconnect}/bin/kdeconnect-cli --refresh || true
-  '';
 }
 

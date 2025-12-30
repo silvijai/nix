@@ -110,6 +110,14 @@
     };
   };
 
+  # Perfect Sway + Flatpak setup
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gtk ];
+    xdgOpenUsePortal = true;  # Opens flatpaks correctly
+  };
+
+
   # ✅ Essential macOS-like apps (MERGES with workstation.nix)
   home.packages = with pkgs; [
     # Terminal (already in workstation.nix, but explicit for clarity)
@@ -118,14 +126,8 @@
     # Cmd+D launcher
     wofi
     
-    # Cmd+Q file manager
-    thunar
-    
     # Screenshot tools
-    grim slurp wl-clipboard swappy
-    
-    # Browser (already in cross-platform)
-    firefox
+    grim slurp wl-clipboard swappy    
     
     # Audio mixer
     pavucontrol

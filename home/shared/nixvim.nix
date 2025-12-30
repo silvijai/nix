@@ -7,6 +7,21 @@
   programs.nixvim = {
     enable = true;
 
+    # ✅ ADD EXTRA PACKAGES HERE (fixes catppuccin + LSP)
+    extraPackages = with pkgs; [
+      # LSP servers (nixvim auto-detects these)
+      lua-language-server
+      nil                # Nix LSP
+      nodePackages.typescript-language-server
+      rust-analyzer
+      nodePackages.eslint
+      
+      # Formatters/Linters
+      alejandra         # Nix formatter
+      prettier          # JS/TS formatter
+      rustfmt 
+    ];
+
     globals = {
       mapleader = " ";
       maplocalleader = " ";
@@ -65,6 +80,7 @@
             installRustc = false;
           };
           nixd.enable = true;
+          eslint.enable = true;
         };
       };
 

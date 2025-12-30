@@ -47,15 +47,10 @@ in
     handbrake
     gparted
     gnome-disk-utility
+    xfce.thunar
     
     # Wayland essentials
-    wl-clipboard wev wlr-randr kanshi grim slurp swappy wf-recorder
-    
-    # KDE integration
-    libsForQt5.plasma-browser-integration
-    libsForQt5.polkit-kde-agent
-    libsForQt5.spectacle  # KDE screenshot
-    libsForQt5.ark
+    wl-clipboard wev wlr-randr kanshi grim slurp swappy wf-recorder 
     
     # Gaming/VM
     box64 
