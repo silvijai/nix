@@ -16,7 +16,7 @@ in
   # System packages
   environment.systemPackages = with pkgs; [
     dockutil
-    vim
+    neovim
     git
     htop
   ];
