@@ -45,7 +45,15 @@ in
       user = "silvija";
     };
 
-    nixos-utm = mkNixosSystem {
+    nixos-utm-x86 = mkNixosSystem {
+      hostname = "nixos-utm";
+      system = "x86_64-linux";
+      modules = [ ../modules/desktop.nix ];
+      homeModule = ../home/desktop.nix;
+      user = "silvija";
+    };
+
+    nixos-utm-aarch = mkNixosSystem {
       hostname = "nixos-utm";
       system = "aarch64-linux";
       modules = [ ../modules/desktop.nix ];
@@ -53,8 +61,8 @@ in
       user = "silvija";
     };
 
-    asahi-macbook = mkNixosSystem {
-      hostname = "asahi-macbook";
+    nixos-macbook = mkNixosSystem {
+      hostname = "nixos-macbook";
       system = "aarch64-linux";
       modules = [ ../modules/desktop.nix ../modules/asahi.nix ];
       homeModule = ../home/desktop-asahi.nix;
