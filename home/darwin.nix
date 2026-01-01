@@ -5,7 +5,7 @@ in {
   imports = [
     ./common.nix
     ./shared/development.nix
-    ./shared/workstation.nix     # ← Shared GUI apps
+    ./shared/workstation.nix
   ];
 
   # User info
@@ -78,12 +78,7 @@ in {
 
   # macOS-specific additional aliases
   programs.zsh.shellAliases = {
-    # macOS system shortcuts
-    showfiles = "defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder";
-    hidefiles = "defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder";
-    
-    # Quick access
-    icloud = "cd ~/Library/Mobile\\ Documents/com~apple~CloudDocs";
+
   };
 }
 

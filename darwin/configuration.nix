@@ -1,6 +1,7 @@
 { config, pkgs, inputs, lib, username, ... }:
 let
   apps = import ../home/shared/packages/cross-platform-apps.nix { inherit pkgs lib; };
+  darwinApps = import ../home/shared/packages/darwin-apps.nix { inherit pkgs lib; };
 in
 {
   # Set primary user
@@ -13,14 +14,6 @@ in
   nixpkgs.config.allowUnfree = true;
   nixpkgs.hostPlatform = "aarch64-darwin";
 
-  # System packages
-  environment.systemPackages = with pkgs; [
-    dockutil
-    neovim
-    git
-    htop
-  ];
-
   # Homebrew
   homebrew = {
     enable = true;
@@ -32,7 +25,7 @@ in
     
     brews = [ "mas" ];
     
-    casks = apps.macosPreferCask;
+    casks = darwinApps.macosPreferCask;
     
     masApps = {
       "Amphetamine" = 937984704;
@@ -60,6 +53,7 @@ in
       ShowPathbar = true;
       ShowStatusBar = true;
       FXEnableExtensionChangeWarning = false;
+      AppleShowAllFiles = true;
     };
 
     NSGlobalDomain = {

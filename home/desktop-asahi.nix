@@ -3,7 +3,7 @@
   imports = [
     ./desktop.nix
     ./shared/asahi-shared-drive.nix
-    ./flatpak.nix  # ✅ New declarative flatpak
+    ./flatpak.nix
   ];
 
   # Apps from cross-platform

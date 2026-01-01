@@ -1,7 +1,15 @@
 { config, pkgs, lib, ... }:
 {
-  home.stateVersion = "24.05";
+  home.stateVersion = "25.05";
   programs.home-manager.enable = true;
+
+  nix = {
+    package = pkgs.nix;
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+      auto-optimise-store = true;
+    };
+  };
 
   programs.git = {
     enable = true;

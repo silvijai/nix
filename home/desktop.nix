@@ -9,6 +9,21 @@
   home.username = "silvija";
   home.homeDirectory = "/home/silvija";
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   # Universal update alias (works on any NixOS system)
   programs.zsh.shellAliases = {
     update = "sudo nixos-rebuild switch --flake ~/nix#$(hostname)";

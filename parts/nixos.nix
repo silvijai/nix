@@ -1,6 +1,6 @@
 { inputs, ... }:
 let
-  mkNixosSystem = { hostname, system ? "x86_64-linux", modules, homeModule, user, isAsahi ? false }:
+  mkNixosSystem = { hostname, system ? "x86_64-linux", modules ? [], homeModule, user, isAsahi ? false }:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
       
@@ -63,4 +63,3 @@ in
     };
   };
 }
-

@@ -52,10 +52,9 @@
       imports = [
         ./parts/darwin.nix
         ./parts/nixos.nix
+        ./parts/linux.nix
         ./parts/home.nix
         ./parts/formatter.nix
-        ./parts/devshells.nix
-        ./parts/fedora-asahi.nix
       ];
 
       # Allow unfree packages at flake level
