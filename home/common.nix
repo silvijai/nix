@@ -3,6 +3,14 @@
   home.stateVersion = "26.05";
   programs.home-manager.enable = true;
 
+  nix = {
+    package = lib.mkDefault pkgs.nix;
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+      # auto-optimise-store = true;
+    };
+  };
+
   programs.git = {
     enable = true;
     settings = {

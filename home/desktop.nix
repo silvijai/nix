@@ -2,7 +2,6 @@
 {
   imports = [
     ./common.nix
-    ./nix-common.nix
     ./shared/development.nix
     ./shared/workstation.nix  # Includes Kitty and Flatpak
   ];
@@ -116,6 +115,8 @@
     enable = true;
     extraPortals = [ pkgs.xdg-desktop-portal-wlr pkgs.xdg-desktop-portal-gtk ];
     xdgOpenUsePortal = true;  # Opens flatpaks correctly
+
+    config.common.default = "*";
   };
 
 

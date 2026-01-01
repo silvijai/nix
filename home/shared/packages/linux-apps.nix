@@ -15,7 +15,7 @@
     anki
     libreoffice-qt
     
-    # Creative (ARM optimized)
+    # Creative
     blender
     krita
     obs-studio
@@ -43,7 +43,7 @@
     "io.github.zen_browser.zen"
     "org.librewolf.community"
     
-    # Communication (KDE Discover optimized)
+    # Communication
     "com.discordapp.Discord"
     "com.slack.Slack"
     "org.telegram.desktop"

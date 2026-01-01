@@ -1,5 +1,7 @@
 { config, pkgs, lib, modulesPath, ... }:
 {
+  system.stateVersion = "25.11";
+  
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
   ];
@@ -39,6 +41,4 @@
     htop
     tmux
   ];
-
-
 }

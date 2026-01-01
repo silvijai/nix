@@ -2,7 +2,6 @@
 {
   imports = [ 
     ./common.nix
-    ./nix-common.nix
   ];
 
   home.username = "MAID0";

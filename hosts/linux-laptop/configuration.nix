@@ -1,5 +1,7 @@
 { config, pkgs, lib, ... }:
 {
+  system.stateVersion = "25.11";
+
   networking.hostName = "linux-laptop";
   
   # Use mkDefault so NetworkManager can override if needed

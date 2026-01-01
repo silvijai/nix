@@ -1,96 +1,113 @@
-.PHONY: help darwin nixos-server nixos-laptop nixos-asahi fedora-asahi vm check update clean
+.PHONY: help darwin darwin-test \
+        nixos-server nixos-server-test \
+        nixos-laptop nixos-laptop-test \
+        nixos-macbook nixos-macbook-test \
+        nixos-utm-x86 nixos-utm-x86-test \
+        nixos-utm-aarch nixos-utm-aarch-test \
+        vm vm-run \
+        check update clean
+
+# ----- Help -----
 
 help:
 	@echo "Available targets:"
-	@echo "  darwin                - Build macOS"
-	@echo "  darwin-test           - Test macOS build"
-	@echo "  nixos-server          - Deploy server"
-	@echo "  nixos-laptop          - Build laptop"
-	@echo "  nixos-laptop-test     - Test laptop build"
-	@echo "  nixos-asahi           - Build NixOS Asahi (System)"
-	@echo "  nixos-asahi-test      - Test NixOS Asahi build"
-	@echo "  fedora-asahi          - Apply Fedora Asahi (Home Manager)"
-	@echo "  fedora-asahi-test     - Test Fedora Asahi build"
-	@echo "  asahi-test-from-macos - Cross-compile test from macOS"
-	@echo "  check                 - Check flake"
-	@echo "  update                - Update inputs"
-	@echo "  clean                 - Clean garbage"
+	@echo "  darwin                - Deploy macOS (nix-darwin)"
+	@echo "  darwin-test           - Build macOS config only"
+	@echo "  nixos-server          - Deploy NixOS server (remote)"
+	@echo "  nixos-server-test     - Build NixOS server config"
+	@echo "  nixos-laptop          - Deploy NixOS laptop"
+	@echo "  nixos-laptop-test     - Build NixOS laptop config"
+	@echo "  nixos-macbook         - Deploy NixOS Asahi on MacBook"
+	@echo "  nixos-macbook-test    - Build NixOS Asahi config"
+	@echo "  nixos-utm-x86         - Deploy x86_64 NixOS UTM VM"
+	@echo "  nixos-utm-x86-test    - Build x86_64 NixOS UTM VM config"
+	@echo "  nixos-utm-aarch       - Deploy aarch64 NixOS UTM VM"
+	@echo "  nixos-utm-aarch-test  - Build aarch64 NixOS UTM VM config"
+	@echo "  vm                    - Build default NixOS UTM VM"
+	@echo "  vm-run                - Run default NixOS UTM VM"
+	@echo "  check                 - nix flake check"
+	@echo "  update                - nix flake update"
+	@echo "  clean                 - GC + store optimise"
 
-# macOS
+
+# ----- macOS (Darwin) -----
+
 darwin:
-	sudo darwin-rebuild switch --flake .#Viliuss-MacBook-Pro
+	sudo darwin-rebuild switch --flake .#Silvijas-Macbook
 
 darwin-test:
-	darwin-rebuild build --flake .#Viliuss-MacBook-Pro
+	darwin-rebuild build --flake .#Silvijas-Macbook
 
-# NixOS Server
+
+# ----- NixOS: server (remote) -----
+
 nixos-server:
 	nixos-rebuild switch --flake .#nixos-server \
 		--target-host maid-server \
 		--use-remote-sudo \
 		--build-host localhost
 
-# NixOS Laptop
+nixos-server-test:
+	nixos-rebuild build --flake .#nixos-server
+
+
+# ----- NixOS: laptop (bare metal) -----
+
 nixos-laptop:
 	sudo nixos-rebuild switch --flake .#linux-laptop
 
 nixos-laptop-test:
 	nixos-rebuild build --flake .#linux-laptop
 
-# NixOS Asahi
-nixos-asahi:
-	sudo nixos-rebuild switch --flake .#asahi-macbook
 
-nixos-asahi-test:
-	nixos-rebuild build --flake .#asahi-macbook
+# ----- NixOS: Asahi MacBook (bare metal) -----
 
-# Fedora Asahi (Home Manager Standalone)
-fedora-asahi:
-	nix run home-manager -- switch --flake .#fedora-asahi
+nixos-macbook:
+	sudo nixos-rebuild switch --flake .#nixos-macbook
 
-fedora-asahi-test:
-	nix build .#homeConfigurations."fedora-asahi".activationPackage
+nixos-macbook-test:
+	nixos-rebuild build --flake .#nixos-macbook
 
-asahi-test-from-macos:
-	nix build .#nixosConfigurations.asahi-macbook.config.system.build.toplevel
 
-asahi-setup-cache:
-	@if ! grep -q "nixos-apple-silicon.cachix.org" /etc/nix/nix.conf 2>/dev/null; then \
-		echo "substituters = https://cache.nixos.org https://nixos-apple-silicon.cachix.org" | sudo tee -a /etc/nix/nix.conf; \
-		echo "trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nixos-apple-silicon.cachix.org-1:fVbPuKGzmcq4oCNq4WYJ6fXQOBLnJZGN+kLJ4RbBBFs=" | sudo tee -a /etc/nix/nix.conf; \
-	fi
+# ----- NixOS: UTM VMs -----
 
-# VM
+nixos-utm-x86:
+	sudo nixos-rebuild switch --flake .#nixos-utm-x86
+
+nixos-utm-x86-test:
+	nixos-rebuild build --flake .#nixos-utm-x86
+
+nixos-utm-aarch:
+	sudo nixos-rebuild switch --flake .#nixos-utm-aarch
+
+nixos-utm-aarch-test:
+	nixos-rebuild build --flake .#nixos-utm-aarch
+
+
+# Default VM build (uses nixos-utm-aarch by convention)
+
 vm:
-	nix build .#nixosConfigurations.nixos-utm.config.system.build.vm
+	nix build .#nixosConfigurations.nixos-utm-aarch.config.system.build.vm
 
 vm-run: vm
-	./result/bin/run-nixos-utm
+	./result/bin/run-nixos-vm || ./result/bin/run-nixos-utm || true
 
-# Maintenance
+
+# ----- Maintenance -----
+
 check:
-	nix flake check
+	nix flake check --all-systems
 
 update:
 	nix flake update
 
 clean:
 	@echo "Cleaning up..."
-	nix-collect-garbage -d
-	sudo nix-collect-garbage -d
+	nix-collect-garbage -d || true
+	sudo nix-collect-garbage -d || true
 	@if [ "$$(uname)" = "Darwin" ]; then \
-		echo "Cleaning Homebrew..."; \
-		brew cleanup -s || true; \
-		brew autoremove || true; \
 		echo "Cleaning old Darwin generations..."; \
 		sudo nix-env --delete-generations old --profile /nix/var/nix/profiles/system || true; \
-		echo "Optimizing Nix store..."; \
-		nix store optimise; \
-	else \
-		echo "Cleaning old NixOS/Home Manager generations..."; \
-		sudo nix-collect-garbage -d; \
-		nix-collect-garbage -d; \
-		nix store optimise; \
 	fi
+	nix store optimise || true
 	@echo "Done!"
-
