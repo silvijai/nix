@@ -53,7 +53,6 @@
         ./parts/darwin.nix
         ./parts/nixos.nix
         ./parts/linux.nix
-        ./parts/home.nix
         ./parts/formatter.nix
       ];
 

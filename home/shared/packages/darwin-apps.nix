@@ -1,5 +1,4 @@
 { pkgs, lib, ... }:
-in
 {
 # macOS Homebrew casks (not used in this file, but kept for reference)
   macosPreferCask = [

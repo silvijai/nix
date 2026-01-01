@@ -4,7 +4,7 @@
     ./hardware-configuration.nix
   ];
 
-  networking.hostName = "asahi-macbook";
+  networking.hostName = "nixos-macbook";
 
   users.users.${user} = {
     isNormalUser = true;
@@ -16,7 +16,5 @@
   };
 
   security.sudo.wheelNeedsPassword = false;
-
-  system.stateVersion = "24.11";
 }
 

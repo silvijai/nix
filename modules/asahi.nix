@@ -1,8 +1,6 @@
 { config, pkgs, lib, inputs, ... }:
 {
-  imports = [
-    ./fex-emu.nix  # ← Add this
-  ];
+  imports = [];
   
   # Apple Silicon hardware support
   hardware.asahi = {

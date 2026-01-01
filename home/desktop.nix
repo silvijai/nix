@@ -2,6 +2,7 @@
 {
   imports = [
     ./common.nix
+    ./nix-common.nix
     ./shared/development.nix
     ./shared/workstation.nix  # Includes Kitty and Flatpak
   ];
@@ -9,27 +10,12 @@
   home.username = "silvija";
   home.homeDirectory = "/home/silvija";
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   # Universal update alias (works on any NixOS system)
   programs.zsh.shellAliases = {
     update = "sudo nixos-rebuild switch --flake ~/nix#$(hostname)";
   };
 
-  # ✅ FULL macOS-STYLE SWAY CONFIG
+  # FULL macOS-STYLE SWAY CONFIG
   wayland.windowManager.sway = {
     enable = true;
     wrapperFeatures.gtk = true;
@@ -88,7 +74,7 @@
         };
       };
 
-      # ✅ CORRECT - Simple string syntax 
+      # CORRECT - Simple string syntax 
       keybindings = {
         "Mod4+Return" = "exec ${pkgs.kitty}/bin/kitty";
         "Mod4+Shift+q" = "kill";
@@ -133,7 +119,7 @@
   };
 
 
-  # ✅ Essential macOS-like apps (MERGES with workstation.nix)
+  # Essential macOS-like apps (MERGES with workstation.nix)
   home.packages = with pkgs; [
     # Terminal (already in workstation.nix, but explicit for clarity)
     kitty
@@ -154,7 +140,7 @@
     bluez
   ];
 
-  # ✅ Waybar (macOS menu bar style)
+  # Waybar (macOS menu bar style)
   programs.waybar = {
     enable = true;
     systemd.enable = true;
@@ -173,7 +159,7 @@
     }];
   };
 
-  # ✅ Autostart (safe with your imports)
+  # Autostart (safe with your imports)
   programs.zsh.profileExtra = ''
     if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
       exec sway

@@ -1,20 +1,8 @@
 { config, pkgs, lib, user, ... }:
 {
-  # Enable Hyprland (Wayland compositor)
-  programs.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-  };
-
   # Display manager
   services.greetd = {
     enable = true;
-    settings = {
-      default_session = {
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd Hyprland";  # Changed this line
-        user = "greeter";
-      };
-    };
   };
 
   # Audio
@@ -50,11 +38,13 @@
   # Thunar
   programs.thunar = {
     enable = true;
-    plugins = with pkgs.xfce; [
-      thunar-archive-plugin
+
+    plugins = with pkgs; [
+      xfce.thunar-archive-plugin
       thunar-volman
     ];
   };
+
 
   services.gvfs.enable = true;
 
@@ -82,6 +72,7 @@
     flatpak
     xwayland
     xorg.xeyes
+    
   ];
 
   # Fonts
@@ -119,7 +110,6 @@
     SDL_VIDEODRIVER = "wayland";
     _JAVA_AWT_WM_NONREPARENTING = "1";
     XDG_SESSION_TYPE = "wayland";
-    XDG_CURRENT_DESKTOP = "Hyprland";
     XCURSOR_SIZE = "24";
   };
 }

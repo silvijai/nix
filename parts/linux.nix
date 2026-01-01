@@ -6,7 +6,6 @@ let
       pkgs = inputs.nixpkgs.legacyPackages.${system};
       
       modules = [
-        ../modules/nix-common.nix  # Shared Nix setup (if exists, or create)
         homeModule
       ];
       

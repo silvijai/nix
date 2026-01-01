@@ -4,7 +4,7 @@
     oh-my-zsh = {
       enable = true;
       theme = "robbyrussell";
-      plugins = [ "git" "docker" "rust" "npm" "node" "python" ];
+      plugins = [ "git" "docker" "rust" "npm" "bun" "node" "python" ];
     };
 
     shellAliases = {

@@ -1,7 +1,7 @@
 { inputs, ... }:
 {
   flake.darwinConfigurations = {
-    "Viliuss-MacBook-Pro" = inputs.nix-darwin.lib.darwinSystem {
+    "Silvijas-Macbook" = inputs.nix-darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       
       modules = [

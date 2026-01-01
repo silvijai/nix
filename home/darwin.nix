@@ -4,6 +4,7 @@ let
 in {
   imports = [
     ./common.nix
+    ./nix-common.nix
     ./shared/development.nix
     ./shared/workstation.nix
   ];

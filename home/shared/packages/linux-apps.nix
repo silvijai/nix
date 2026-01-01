@@ -1,5 +1,4 @@
 { pkgs, lib, ... }:
-in
 {
 # Native Nix packages (Linux)
   linuxNix = with pkgs; [
@@ -28,7 +27,7 @@ in
     handbrake
     gparted
     gnome-disk-utility
-    xfce.thunar
+    thunar
     
     # Wayland essentials
     wl-clipboard wev wlr-randr kanshi grim slurp swappy wf-recorder 
@@ -36,12 +35,10 @@ in
     # Gaming/VM
     box64 
     qemu
-  ] ++ lib.optionals isX86_64 [
-    steam heroic lutris wine winetricks makemkv
   ];
 
   # DECLARATIVE FLATPAK (Replaces script)
-  flatpaks = with lib; [
+  flatpaks = [
     # Browsers
     "io.github.zen_browser.zen"
     "org.librewolf.community"

@@ -19,6 +19,4 @@
     device = "/dev/disk/by-label/boot";
     fsType = "vfat";
   };
-
-  system.stateVersion = "25.05";
 }

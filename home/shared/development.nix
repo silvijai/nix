@@ -1,32 +1,35 @@
 { config, pkgs, ... }:
 {
   home.packages = with pkgs; [
-    # Python
+    # ---------- Python ----------
     python3
-    virtualenv
+    python3Packages.virtualenv
+    python3Packages.pip-tools
+    python3Packages.ipython
 
-    # C#
+    # ---------- C# ----------
     dotnet-sdk
 
-    # JavaScript/TypeScript
+    # ---------- JavaScript / TypeScript ----------
     nodejs_24
-    nodePackages.eslint
-    nodePackages.prettier
     nodePackages.typescript
     nodePackages.typescript-language-server
+    nodePackages.prettier
+    nodePackages.eslint
     bun
 
-    # Rust
+    # ---------- Rust ----------
     rustup
+    cargo-watch
+    cargo-expand
 
-    # Media tools
+    # ---------- Media tools ----------
     ffmpeg
 
-    # Utilities
+    # ---------- Utilities ----------
     wakeonlan
   ];
 
-  # Development aliases
   programs.zsh.shellAliases = {
     # Git shortcuts
     gs = "git status";
@@ -35,7 +38,7 @@
     gl = "git pull";
     gd = "git diff";
     gco = "git checkout";
-    
+
     # Development
     py = "python3";
     serve = "python3 -m http.server";
