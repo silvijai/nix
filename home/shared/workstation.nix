@@ -16,9 +16,33 @@ in
     ./apps/kitty.nix
   ];
 
-  # Rest of your aliases unchanged...
-  programs.zsh.shellAliases = {
-    # ... your existing aliases
-  };
+  # Workstation aliases
+  programs.zsh.shellAliases = lib.mkMerge [
+    {
+      code = "codium";
+      v = "nvim";
+      vi = "nvim";
+      term = "kitty";
+    }
+    (lib.mkIf pkgs.stdenv.isDarwin {
+      update = lib.mkDefault "darwin-rebuild switch --flake /Users/viliusi/nix";
+    })
+    (lib.mkIf pkgs.stdenv.isLinux {
+      update = lib.mkDefault "sudo nixos-rebuild switch --flake /home/viliusi/nix#linux-laptop";
+      
+      # Clipboard (Wayland)
+      pbcopy = "wl-copy";
+      pbpaste = "wl-paste";
+      
+      # Flatpak management
+      flatpak-install = "flatpak-install";
+      flatpak-update = "flatpak update -y";
+      flatpak-clean = "flatpak uninstall --unused -y";
+      flatpak-list = "flatpak list --app";
+      
+      # Check if app is using Wayland
+      wayland-check = "echo 'XDG_SESSION_TYPE:' $XDG_SESSION_TYPE && echo 'WAYLAND_DISPLAY:' $WAYLAND_DISPLAY";
+    })
+  ];
 }
 

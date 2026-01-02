@@ -1,5 +1,8 @@
-{ pkgs, lib, ... }:
 {
+  pkgs,
+  lib,
+  ...
+}: {
   # Universal apps (macOS + Linux)
   both = with pkgs; [
     git
@@ -11,8 +14,5 @@
     fzf
     tldr
     neovim
-    inkscape
-    audacity
-    sioyek
   ];
 }
