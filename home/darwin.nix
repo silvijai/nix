@@ -10,6 +10,8 @@ in {
     ./common.nix
     ./shared/development.nix
     ./shared/workstation.nix
+    ../modules/sway-vm.nix
+    ../modules/sway-vm-safe.nix
   ];
 
   # User info
@@ -77,6 +79,44 @@ in {
     else
       echo "⚠ SharedData not mounted at $SHARED_PATH"
     fi
+  '';
+
+  # Ensure the directory exists and place the file
+  xdg.configFile."karabiner/assets/complex_modifications/hyper_f20.json".text = ''
+    {
+      "title": "Caps Lock: Hyper (hold), F20 (tap), Normal Caps (Fn+tap)",
+      "rules": [
+        {
+          "description": "Caps Lock Behavior Logic",
+          "manipulators": [
+            {
+              "description": "Fn + Caps Lock -> Standard Caps Lock (Toggle Fix)",
+              "from": {
+                "key_code": "caps_lock",
+                "modifiers": { "mandatory": ["fn"], "optional": ["any"] }
+              },
+              "to": [{ "key_code": "caps_lock" }],
+              "type": "basic"
+            },
+            {
+              "description": "Caps Lock -> Hyper Key (Hold) / F20 (Tap)",
+              "from": {
+                "key_code": "caps_lock",
+                "modifiers": { "optional": ["any"] }
+              },
+              "to": [
+                {
+                  "key_code": "left_shift",
+                  "modifiers": ["left_command", "left_control", "left_option"]
+                }
+              ],
+              "to_if_alone": [{ "key_code": "f20" }],
+              "type": "basic"
+            }
+          ]
+        }
+      ]
+    }
   '';
 
   # macOS-specific additional aliases

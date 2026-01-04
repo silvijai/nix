@@ -19,6 +19,7 @@
     "macs-fan-control"
     "hiddenbar"
     "mos"
+    "monitorcontrol"
 
     # Browsers
     "zen"
@@ -91,4 +92,3 @@
     "sioyek"
   ];
 }
-

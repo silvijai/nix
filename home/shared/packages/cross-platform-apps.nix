@@ -14,5 +14,7 @@
     fzf
     tldr
     neovim
+    lima
+    qemu
   ];
 }
