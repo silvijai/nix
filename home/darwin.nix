@@ -11,7 +11,6 @@ in {
     ./shared/development.nix
     ./shared/workstation.nix
     ../modules/sway-vm.nix
-    ../modules/sway-vm-safe.nix
   ];
 
   # User info
