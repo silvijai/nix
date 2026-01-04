@@ -4,143 +4,134 @@
   lib,
   ...
 }: {
-  home. file. ".local/bin/sway" = {
+  home. packages = with pkgs; [
+    lima
+    qemu # Need QEMU for raw disk access
+  ];
+
+  home.  file. ". local/bin/sway-test" = {
     executable = true;
     text = ''
-      #!/usr/bin/env bash
-      set -euo pipefail
+            #!/usr/bin/env bash
+            set -euo pipefail
 
-      VM_NAME="nixos-sway"
+            VM_NAME="nixos-sway"
+            LIMA_CONFIG="$HOME/nix/hosts/nixos-sway/lima.yaml"
 
-      GREEN='\033[0;32m'
-      BLUE='\033[0;34m'
-      YELLOW='\033[1;33m'
-      RED='\033[0;31m'
-      NC='\033[0m'
+            GREEN='\033[0;32m'
+            BLUE='\033[0;34m'
+            YELLOW='\033[1;33m'
+            RED='\033[0;31m'
+            NC='\033[0m'
 
-      # Function to check if partition is mounted
-      check_partition_mounted() {
-          local partition="$1"
-          if mount | grep -q "$partition"; then
-              echo -e "''${RED}❌ Error: Partition $partition is currently mounted! ''${NC}"
-              echo -e "''${YELLOW}Please unmount it first or boot into NixOS on real hardware.''${NC}"
-              return 1
-          fi
-          return 0
-      }
+            # Safety checks
+            safety_checks() {
+                echo -e "''${BLUE}🔒 Running safety checks...''${NC}"
 
-      # Function to detect NixOS partition
-      detect_nixos_partition() {
-          echo -e "''${BLUE}🔍 Detecting NixOS partition...''${NC}"
+                # Check if partition is mounted
+                if mount | grep -q "disk0s7"; then
+                    echo -e "''${YELLOW}⚠️  Warning: NixOS partition is mounted''${NC}"
+                    echo -e "''${YELLOW}   Unmounting for safe VM access...''${NC}"
+                    sudo diskutil unmount /dev/disk0s7 || {
+                        echo -e "''${RED}Failed to unmount.  Please unmount manually.''${NC}"
+                        exit 1
+                    }
+                fi
 
-          # Look for Linux filesystems
-          diskutil list | grep -i "linux" || {
-              echo -e "''${RED}❌ No Linux partitions found!''${NC}"
-              echo "Please specify partition manually in lima-direct.yaml"
-              exit 1
-          }
+                if mount | grep -q "disk0s5"; then
+                    sudo diskutil unmount /dev/disk0s5
+                fi
 
-          echo -e "''${YELLOW}⚠️  Verify the partition in ~/. lima/$VM_NAME/lima.yaml''${NC}"
-      }
+                # Check not booted into NixOS
+                if [ -f /etc/NIXOS ]; then
+                    echo -e "''${RED}❌ Currently booted into NixOS! ''${NC}"
+                    exit 1
+                fi
 
-      # Function to unmount partition if needed
-      unmount_if_needed() {
-          local partition="$1"
-          if mount | grep -q "$partition"; then
-              echo -e "''${YELLOW}📤 Unmounting $partition...''${NC}"
-              sudo diskutil unmount "$partition" || {
-                  echo -e "''${RED}Failed to unmount.  Please do it manually.''${NC}"
-                  exit 1
-              }
-          fi
-      }
+                echo -e "''${GREEN}✅ Safety checks passed''${NC}"
+            }
 
-      # Check if Lima is installed
-      if ! command -v limactl &> /dev/null; then
-          echo -e "''${RED}❌ Lima not installed. Install with: brew install lima''${NC}"
-          exit 1
-      fi
+            # Check config exists
+            check_config() {
+                if [ ! -f "$LIMA_CONFIG" ]; then
+                    echo -e "''${RED}❌ Config not found:  $LIMA_CONFIG''${NC}"
+                    exit 1
+                fi
+            }
 
-      # Create VM if it doesn't exist
-      if !  limactl list | grep -q "^$VM_NAME"; then
-          echo -e "''${BLUE}📦 Creating VM configuration...''${NC}"
+            # Create VM
+            create_vm() {
+                if !  limactl list 2>/dev/null | grep -q "^$VM_NAME"; then
+                    echo -e "''${BLUE}📦 Creating VM... ''${NC}"
 
-          # Detect partition
-          detect_nixos_partition
+                    # Need sudo for raw disk access
+                    echo -e "''${YELLOW}⚠️  Sudo required for raw disk access''${NC}"
+                    sudo limactl create --name="$VM_NAME" "$LIMA_CONFIG"
+                fi
+            }
 
-          # Create VM
-          limactl create --name="$VM_NAME" ~/nix/hosts/nixos-sway/lima-direct.yaml
+            # Start VM
+            start_vm() {
+                if ! limactl list | grep "^$VM_NAME" | grep -q "Running"; then
+                    echo -e "''${BLUE}🚀 Starting VM...''${NC}"
+                    sudo limactl start "$VM_NAME"
 
-          echo -e "''${YELLOW}⚠️  IMPORTANT: Edit ~/. lima/$VM_NAME/lima. yaml''${NC}"
-          echo -e "''${YELLOW}   and set the correct disk device path! ''${NC}"
-          read -p "Press enter when ready..."
-      fi
+                    echo -e "''${BLUE}⏳ Waiting for boot...''${NC}"
+                    sleep 10
 
-      # Check if VM is running
-      if ! limactl list | grep "^$VM_NAME" | grep -q "Running"; then
-          echo -e "''${BLUE}🚀 Starting VM...''${NC}"
+                    echo -e "''${GREEN}✅ VM started''${NC}"
+                else
+                    echo -e "''${GREEN}✅ VM already running''${NC}"
+                fi
+            }
 
-          # Note: You might need to unmount the partition first
-          # Uncomment if needed:
-          # unmount_if_needed "/dev/disk0s5"  # Change to your partition
+            # Launch Sway
+            launch_sway() {
+                echo -e "''${GREEN}🪟 Launching Sway... ''${NC}"
 
-          limactl start "$VM_NAME"
-          sleep 5
-      else
-          echo -e "''${GREEN}✅ VM already running''${NC}"
-      fi
+                limactl shell "$VM_NAME" bash <<'EOF'
+                  export XDG_RUNTIME_DIR=/run/user/$(id -u)
+                  export WAYLAND_DISPLAY=wayland-1
 
-      # Launch Sway
-      echo -e "''${GREEN}🪟 Launching Sway... ''${NC}"
+                  # Check if sway exists
+                  if command -v sway &> /dev/null; then
+                      exec sway
+                  else
+                      echo "Sway not found. Dropping to shell..."
+                      exec bash
+                  fi
+      EOF
+            }
 
-      # Since you have existing Asahi setup, user might be different
-      # Adjust username if needed
-      limactl shell "$VM_NAME" sudo -u silvijai bash -c '
-          export XDG_RUNTIME_DIR=/run/user/$(id -u)
-          export WAYLAND_DISPLAY=wayland-1
+            main() {
+                safety_checks
+                check_config
+                create_vm
+                start_vm
+                launch_sway
+            }
 
-          # If Sway is already running, connect to it
-          if pgrep -x sway > /dev/null; then
-              swaymsg
-          else
-              exec sway
-          fi
-      '
+            main "$@"
     '';
   };
 
-  home.file.".local/bin/detect-nixos-partition" = {
+  # Keep other scripts from before
+  home.file. ".local/bin/nixos-partition-info" = {
+    # Same as before
     executable = true;
     text = ''
       #!/usr/bin/env bash
-
-      echo "Looking for Linux partitions..."
-      echo ""
-
-      diskutil list | grep -B 5 -A 2 -i "linux"
-
-      echo ""
-      echo "To get detailed info about a partition:"
-      echo "  diskutil info /dev/diskXsY"
-      echo ""
-      echo "To check if NixOS:"
-      echo "  sudo file -s /dev/diskXsY"
-      echo "  sudo blkid /dev/diskXsY"
+      diskutil list
     '';
   };
 
-  home.file.".local/bin/sway-mount-check" = {
+  home. file.".local/bin/sway-vm-stop" = {
     executable = true;
     text = ''
       #!/usr/bin/env bash
-
-      # Check what's mounted
-      echo "Currently mounted partitions:"
-      mount | grep "^/dev"
-
-      echo ""
-      echo "Lima VMs:"
-      limactl list
+      echo "🛑 Stopping VM..."
+      sudo limactl stop nixos-sway
+      echo "✅ Stopped"
     '';
   };
 

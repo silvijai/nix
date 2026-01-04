@@ -1,0 +1,49 @@
+# Use QEMU backend for raw disk access
+vmType: "qemu"
+
+# No ISO needed - boot directly from your partition
+images:  []
+
+arch: "aarch64"
+
+cpus: 4
+memory: "8GiB"
+
+# Access your existing partitions directly
+disks:
+  # Your NixOS root partition
+  - location: "/dev/disk0s7"
+    format: false  # Don't format! 
+  # Your EFI partition  
+  - location: "/dev/disk0s5"
+    format: false
+
+# Mount macOS directories
+mounts:
+  - location: "~"
+    writable: true
+  - location: "/Volumes/Shared"
+    writable: true
+
+mountType: "reverse-sshfs"
+
+containerd:
+  system: false
+  user: false
+
+networks:
+  - lima:  shared
+
+firmware:
+  legacyBIOS: false
+
+ssh:
+  localPort: 0
+  loadDotSSHPubKeys:  true
+
+# Additional QEMU options
+qemu: 
+  # Enable EFI boot
+  efi: true
+  
+provision: []
