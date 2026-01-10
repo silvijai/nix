@@ -31,32 +31,28 @@
     options = ["nofail"]; # Add nofail here too just in case
   };
 
-  # CHANGE THIS SECTION:
-  fileSystems."/mnt/Shared" = {
+  # PHYSICAL MOUNT (Use only when NOT in a VM)
+  fileSystems."/mnt/Shared" = lib.mkIf (!config.services.qemuGuest.enable) {
     device = "/dev/disk/by-label/Shared";
     fsType = "exfat";
-    # We add a 5-second timeout so it doesn't hang for 90 seconds in the VM
-    options = [
-      "nofail"
-      "x-systemd.automount"
-      "x-systemd.device-timeout=5s"
-      "uid=1000"
-      "gid=100"
-      "umask=0022"
-    ];
+    options = ["nofail" "x-systemd.automount" "uid=1000" "gid=100" "umask=0022"];
   };
 
-  # ADD THIS: This handles the macOS Folder Share when in the VM
+  # VM MOUNT (Use only when in a QEMU VM)
   systemd.mounts = [
     {
       description = "Mount Shared folder from macOS Host";
       where = "/mnt/Shared";
-      what = "host-shared"; # This matches the 'mount_tag' in our QEMU script
+      what = "host-shared";
       type = "9p";
       options = "trans=virtio,version=9p2000.L,msize=1048576";
-      unitConfig.ConditionVirtualization = "qemu"; # Only runs in the VM!
+      unitConfig.ConditionVirtualization = "qemu";
+      wantedBy = ["multi-user.target"]; # Ensure it starts on boot
     }
   ];
+
+  # Make sure QEMU guest services are detected
+  services.qemuGuest.enable = lib.mkDefault true;
 
   swapDevices = [];
 

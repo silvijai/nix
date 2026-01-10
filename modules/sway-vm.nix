@@ -10,40 +10,35 @@
       #!/usr/bin/env bash
       set -euo pipefail
 
-      GREEN='\033[0;32m'
       BLUE='\033[0;34m'
       YELLOW='\033[1;33m'
       RED='\033[0;31m'
       NC='\033[0m'
 
-      # Use Homebrew QEMU
-      QEMU="/opt/homebrew/bin/qemu-system-aarch64"
-      BIOS="/opt/homebrew/share/qemu/edk2-aarch64-code.fd"
-      VARS="/tmp/nixos-sway-vars. fd"
+      QEMU="${pkgs.qemu}/bin/qemu-system-aarch64"
+      BIOS="${pkgs.qemu}/share/qemu/edk2-aarch64-code.fd"
+      VARS_TEMPLATE="${pkgs.qemu}/share/qemu/edk2-arm-vars.fd"
+      VARS="$HOME/.local/share/nixos-vm-vars.fd"
 
-      if [ ! -x "$QEMU" ]; then
-          echo -e "''${RED}❌ QEMU not found. Run: brew install qemu''${NC}"
-          exit 1
-      fi
-
-      # Create persistent UEFI variables if they don't exist
-      # This allows the VM to remember boot entries
+      # Initialize UEFI vars if they don't exist
       if [ ! -f "$VARS" ]; then
-          cp "/opt/homebrew/share/qemu/edk2-arm-vars.fd" "$VARS"
+          echo -e "''${YELLOW}📝 Initializing UEFI vars...''${NC}"
+          mkdir -p "$(dirname "$VARS")"
+          cp "$VARS_TEMPLATE" "$VARS"
           chmod +w "$VARS"
       fi
 
-      # Unmount partitions from macOS
-      echo -e "''${BLUE}🔒 Preparing partitions (unmounting from macOS)...''${NC}"
-      diskutil unmount /dev/disk0s7 2>/dev/null || true
+      echo -e "''${BLUE}🔒 Preparing OS partitions (unmounting from macOS)...''${NC}"
+      # We ONLY unmount the NixOS partitions (Boot & Root)
+      # This is REQUIRED because macOS and NixOS cannot 'write' to the same raw block at once.
       diskutil unmount /dev/disk0s5 2>/dev/null || true
+      diskutil unmount /dev/disk0s7 2>/dev/null || true
 
-      echo -e "''${BLUE}🚀 Starting NixOS...''${NC}"
-      echo -e "''${YELLOW}If you see a Shell prompt, type 'exit' or check 'Boot Manager' ''${NC}"
+      echo -e "''${BLUE}🚀 Starting NixOS (Requires sudo for raw disk access)...''${NC}"
       echo ""
 
-      # Run QEMU with 4K alignment and raw access optimizations
-      "$QEMU" \
+      # Use 'sudo' here to grant QEMU access to /dev/rdisk0sX
+      sudo "$QEMU" \
         -machine virt,accel=hvf,highmem=on \
         -cpu host \
         -smp 4 \
@@ -56,16 +51,13 @@
         -drive file=/dev/rdisk0s7,if=none,id=drive-root,format=raw,cache=none \
         -virtfs local,path=/Volumes/Shared,mount_tag=host-shared,security_model=none,id=host-shared \
         -device virtio-gpu-pci \
-        -display cocoa \
+        -display cocoa,full-screen=on,show-cursor=on \
         -device virtio-net-pci,netdev=net0 \
         -netdev user,id=net0 \
-        -device usb-ehci \
-        -device usb-kbd \
-        -device usb-tablet \
-        -vga none \
+        -device virtio-keyboard-pci \
+        -device virtio-tablet-pci \
+        -device intel-hda -device hda-duplex \
         -serial stdio
     '';
   };
-
-  home.sessionPath = ["$HOME/. local/bin"];
 }

@@ -14,7 +14,7 @@
     fzf
     tldr
     neovim
-    lima
     qemu
+    virt-viewer
   ];
 }
