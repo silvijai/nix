@@ -7,54 +7,45 @@
 }: {
   imports = [(modulesPath + "/installer/scan/not-detected.nix")];
 
-  boot.initrd.supportedFilesystems = ["btrfs"];
-
-  boot = {
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = false;
-    };
-
-    extraModprobeConfig = ''
-      options hid_apple iso_layout=0
-    '';
-  };
-
+  # PHYSICAL DISK LAYOUT
   fileSystems."/" = {
     device = "/dev/disk/by-label/nixos";
     fsType = "ext4";
   };
 
-  ileSystems."/boot" = {
+  fileSystems."/boot" = {
     device = "/dev/disk/by-label/EFI";
     fsType = "vfat";
-    options = ["nofail"]; # Add nofail here too just in case
+    options = ["nofail"];
   };
 
-  # PHYSICAL MOUNT (Use only when NOT in a VM)
+  # PHYSICAL SHARED PARTITION (Only when NOT in VM)
   fileSystems."/mnt/Shared" = lib.mkIf (!config.services.qemuGuest.enable) {
     device = "/dev/disk/by-label/Shared";
     fsType = "exfat";
     options = ["nofail" "x-systemd.automount" "uid=1000" "gid=100" "umask=0022"];
   };
 
-  # VM MOUNT (Use only when in a QEMU VM)
-  systemd.mounts = [
-    {
-      description = "Mount Shared folder from macOS Host";
-      where = "/mnt/Shared";
-      what = "host-shared";
-      type = "9p";
-      options = "trans=virtio,version=9p2000.L,msize=1048576";
-      unitConfig.ConditionVirtualization = "qemu";
-      wantedBy = ["multi-user.target"]; # Ensure it starts on boot
-    }
-  ];
+  # BOOTLOADER (Only when booting natively on M1)
+  boot.loader = lib.mkIf (!config.services.qemuGuest.enable) {
+    systemd-boot.enable = true;
+    efi.canTouchEfiVariables = false;
+  };
 
-  # Make sure QEMU guest services are detected
-  services.qemuGuest.enable = lib.mkDefault true;
+  # ASAHI HARDWARE SUPPORT (Disabled in VM)
+  hardware.graphics.enable = lib.mkIf (!config.services.qemuGuest.enable) true;
+  hardware.asahi = {
+    gpu.enable = lib.mkDefault (!config.services.qemuGuest.enable);
+    audio.enable = lib.mkDefault (!config.services.qemuGuest.enable);
+    bluetooth.enable = lib.mkDefault (!config.services.qemuGuest.enable);
+  };
 
-  swapDevices = [];
+  boot.kernelPackages = lib.mkIf (!config.services.qemuGuest.enable) pkgs.linuxPackages_asahi;
+  boot.kernelParams = ["mitigations=off"];
+
+  boot.extraModprobeConfig = ''
+    options hid_apple iso_layout=0
+  '';
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }

@@ -9,10 +9,18 @@
 
   imports = [
     ./hardware-configuration.nix
-    # <nixos-apple-silicon/apple-silicon-support>
+    ./vm-configuration.nix
+    # Ensure this points to your apple-silicon-support flake input
+    # apple-silicon-support.nixosModules.apple-silicon-support
   ];
 
   networking.hostName = "nixos-macbook";
+
+  # Binary Cache for Asahi/Nix-Community (Prevents kernel rebuilds)
+  nix.settings = {
+    substituters = ["https://nix-community.cachix.org"];
+    trusted-public-keys = ["nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="];
+  };
 
   users.users.${user} = {
     isNormalUser = true;
@@ -24,25 +32,5 @@
   };
 
   security.sudo.wheelNeedsPassword = false;
-
-  # Bootloader (guide required)
-  boot.loader = {
-    systemd-boot.enable = true;
-    efi.canTouchEfiVariables = false; # Apple firmware
-  };
-
-  # Kernel (Asahi - guide provides)
-  boot.kernelPackages = pkgs.linuxPackages_asahi;
-  boot.kernelParams = ["mitigations=off"]; # Performance
-
-  # Network (WiFi fix)
   networking.wireless.iwd.enable = true;
-
-  # Audio/GPU (guide modules)
-  hardware.opengl.enable = true;
-  hardware.asahi = {
-    gpu.enable = true;
-    audio.enable = true;
-    bluetooth.enable = true;
-  };
 }
