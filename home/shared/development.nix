@@ -1,11 +1,19 @@
-{ config, pkgs, ... }:
 {
+  config,
+  pkgs,
+  ...
+}: {
   home.packages = with pkgs; [
     # ---------- Python ----------
     python3
     python3Packages.virtualenv
     python3Packages.pip-tools
     python3Packages.ipython
+    maturin
+    pipx
+    uv
+    pkgconf
+    cairo
 
     # ---------- C# ----------
     dotnet-sdk
@@ -26,8 +34,12 @@
     # ---------- Media tools ----------
     ffmpeg
 
+    # C++/C
+    libgccjit
+
     # ---------- Utilities ----------
     wakeonlan
+    arduino-cli
   ];
 
   programs.zsh.shellAliases = {

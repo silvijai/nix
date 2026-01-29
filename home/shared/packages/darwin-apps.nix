@@ -38,6 +38,7 @@
     "utm"
     "kitty"
     "vscodium"
+    "arduino-ide"
 
     # Creative Suite
     "affinity"
@@ -81,6 +82,7 @@
     "steam"
     "whisky"
     "heroic"
+    "Sikarugir-App/sikarugir/sikarugir"
 
     # AI
     "anythingllm"
@@ -90,5 +92,7 @@
     "spotify"
     "audacity"
     "sioyek"
+    "libreoffice"
+    "libreoffice-language-pack"
   ];
 }

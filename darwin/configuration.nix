@@ -28,7 +28,7 @@ in {
       upgrade = true;
     };
 
-    brews = ["mas" "qemu"];
+    brews = ["mas" "qemu" "avra"];
 
     casks = darwinApps.macosPreferCask;
 

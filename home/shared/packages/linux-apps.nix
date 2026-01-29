@@ -49,6 +49,7 @@
     inkscape
     audacity
     sioyek
+    libreoffice-qt-fresh
   ];
 
   # DECLARATIVE FLATPAK (Replaces script)
@@ -78,4 +79,3 @@
     "io.github.shiftey.Desktop"
   ];
 }
-

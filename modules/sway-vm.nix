@@ -1,13 +1,12 @@
 {
   config,
   pkgs,
-  lib,
   ...
 }: {
   home.file.".local/bin/sway" = {
     executable = true;
     text = ''
-      #!/usr/bin/env bash
+            #!/usr/bin/env bash
       set -euo pipefail
 
       BLUE='\033[0;34m'
@@ -15,29 +14,28 @@
       RED='\033[0;31m'
       NC='\033[0m'
 
-      QEMU="${pkgs.qemu}/bin/qemu-system-aarch64"
-      BIOS="${pkgs.qemu}/share/qemu/edk2-aarch64-code.fd"
-      VARS_TEMPLATE="${pkgs.qemu}/share/qemu/edk2-arm-vars.fd"
+      # Paths (Ensure these match your nix-darwin setup)
+      QEMU="/opt/homebrew/bin/qemu-system-aarch64"
+      BIOS="/opt/homebrew/share/qemu/edk2-aarch64-code.fd"
       VARS="$HOME/.local/share/nixos-vm-vars.fd"
 
-      # Initialize UEFI vars if they don't exist
+      # 1. Initialize UEFI vars if missing
       if [ ! -f "$VARS" ]; then
           echo -e "''${YELLOW}📝 Initializing UEFI vars...''${NC}"
           mkdir -p "$(dirname "$VARS")"
-          cp "$VARS_TEMPLATE" "$VARS"
+          cp "/opt/homebrew/share/qemu/edk2-arm-vars.fd" "$VARS"
           chmod +w "$VARS"
       fi
 
-      echo -e "''${BLUE}🔒 Preparing OS partitions (unmounting from macOS)...''${NC}"
-      # We ONLY unmount the NixOS partitions (Boot & Root)
-      # This is REQUIRED because macOS and NixOS cannot 'write' to the same raw block at once.
-      diskutil unmount /dev/disk0s5 2>/dev/null || true
-      diskutil unmount /dev/disk0s7 2>/dev/null || true
+      # 2. Unmount the OS partitions (Required for safety)
+      echo -e "''${BLUE}🔒 Unmounting OS partitions from macOS...''${NC}"
+      sudo diskutil unmount /dev/disk0s5 || true  # EFI
+      sudo diskutil unmount /dev/disk0s7 || true  # NixOS Root
 
-      echo -e "''${BLUE}🚀 Starting NixOS (Requires sudo for raw disk access)...''${NC}"
-      echo ""
+      echo -e "''${BLUE}🚀 Starting NixOS...''${NC}"
 
-      # Use 'sudo' here to grant QEMU access to /dev/rdisk0sX
+      # 3. Start QEMU using partition-level access
+      # disk0s5 will show up as /dev/vda, disk0s7 as /dev/vdb
       sudo "$QEMU" \
         -machine virt,accel=hvf,highmem=on \
         -cpu host \
@@ -45,9 +43,9 @@
         -m 8G \
         -drive if=pflash,format=raw,unit=0,file="$BIOS",readonly=on \
         -drive if=pflash,format=raw,unit=1,file="$VARS" \
-        -device virtio-blk-pci,drive=drive-boot,logical_block_size=4096,physical_block_size=4096 \
+        -device virtio-blk-pci,drive=drive-boot \
         -drive file=/dev/rdisk0s5,if=none,id=drive-boot,format=raw,cache=none \
-        -device virtio-blk-pci,drive=drive-root,logical_block_size=4096,physical_block_size=4096 \
+        -device virtio-blk-pci,drive=drive-root \
         -drive file=/dev/rdisk0s7,if=none,id=drive-root,format=raw,cache=none \
         -virtfs local,path=/Volumes/Shared,mount_tag=host-shared,security_model=none,id=host-shared \
         -device virtio-gpu-pci \
