@@ -16,7 +16,7 @@
     cairo
 
     # ---------- C# ----------
-    dotnet-sdk
+    # dotnet-sdk
 
     # ---------- JavaScript / TypeScript ----------
     nodejs_24
@@ -35,7 +35,8 @@
     ffmpeg
 
     # C++/C
-    libgccjit
+    conan
+    cmake
 
     # ---------- Utilities ----------
     wakeonlan

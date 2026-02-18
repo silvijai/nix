@@ -39,6 +39,8 @@
     "kitty"
     "vscodium"
     "arduino-ide"
+    "xquartz"
+    "librepcb"
 
     # Creative Suite
     "affinity"
@@ -48,6 +50,8 @@
     "freecad"
     "autodesk-fusion"
     "gimp"
+    "sage"
+    "jupyterlab-app"
 
     # Music Production
     "ableton-live-standard"

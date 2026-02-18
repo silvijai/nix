@@ -1,5 +1,9 @@
-{ config, pkgs, inputs, ... }:
 {
+  config,
+  pkgs,
+  inputs,
+  ...
+}: {
   imports = [
     inputs.nixvim.homeModules.nixvim
   ];
@@ -130,11 +134,11 @@
         enable = true;
         settings = {
           formatters_by_ft = {
-            javascript = [ "prettier" ];
-            typescript = [ "prettier" ];
-            rust       = [ "rustfmt" ];
-            nix        = [ "alejandra" ];
-            python     = [ "black" ];
+            javascript = ["prettier"];
+            typescript = ["prettier"];
+            rust = ["rustfmt"];
+            nix = ["alejandra"];
+            python = ["black"];
           };
           format_on_save = {
             lsp_format = "fallback";
@@ -147,14 +151,15 @@
       lint = {
         enable = true;
         lintersByFt = {
-          javascript = [ "eslint" ];
-          typescript = [ "eslint" ];
-          python     = [ "ruff" ];
+          javascript = ["eslint"];
+          typescript = ["eslint"];
+          python = ["ruff"];
         };
       };
 
       # ---------- Copilot ----------
-      copilot-lua = {
+      /*
+        copilot-lua = {
         enable = true;
         settings = {
           suggestion = {
@@ -223,37 +228,126 @@
           auto_insert_mode   = false;
         };
       };
+      */
     };
 
     keymaps = [
       # Explorer
-      { mode = "n"; key = "<C-n>"; action = ":Neotree toggle<CR>"; options.desc = "Toggle Explorer"; }
+      {
+        mode = "n";
+        key = "<C-n>";
+        action = ":Neotree toggle<CR>";
+        options.desc = "Toggle Explorer";
+      }
 
       # Copilot Chat
-      { mode = "n"; key = "<leader>aa"; action = ":CopilotChatToggle<CR>";   options.desc = "Toggle Copilot Chat"; }
-      { mode = "v"; key = "<leader>aa"; action = ":CopilotChatToggle<CR>";   options.desc = "Toggle Copilot Chat"; }
-      { mode = "n"; key = "<leader>ar"; action = ":CopilotChatReset<CR>";    options.desc = "Reset Chat"; }
-      { mode = "n"; key = "<leader>at"; action = ":CopilotChatToggle<CR>";   options.desc = "Toggle Chat"; }
+      /*
+        {
+        mode = "n";
+        key = "<leader>aa";
+        action = ":CopilotChatToggle<CR>";
+        options.desc = "Toggle Copilot Chat";
+      }
+      {
+        mode = "v";
+        key = "<leader>aa";
+        action = ":CopilotChatToggle<CR>";
+        options.desc = "Toggle Copilot Chat";
+      }
+      {
+        mode = "n";
+        key = "<leader>ar";
+        action = ":CopilotChatReset<CR>";
+        options.desc = "Reset Chat";
+      }
+      {
+        mode = "n";
+        key = "<leader>at";
+        action = ":CopilotChatToggle<CR>";
+        options.desc = "Toggle Chat";
+      }
 
-      { mode = "n"; key = "<leader>ae"; action = ":CopilotChatExplain<CR>";  options.desc = "Explain Code"; }
-      { mode = "v"; key = "<leader>ae"; action = ":CopilotChatExplain<CR>";  options.desc = "Explain Code"; }
-      { mode = "n"; key = "<leader>ap"; action = ":CopilotChatApproach<CR>"; options.desc = "Get Approach"; }
-      { mode = "v"; key = "<leader>ap"; action = ":CopilotChatApproach<CR>"; options.desc = "Get Approach"; }
+      {
+        mode = "n";
+        key = "<leader>ae";
+        action = ":CopilotChatExplain<CR>";
+        options.desc = "Explain Code";
+      }
+      {
+        mode = "v";
+        key = "<leader>ae";
+        action = ":CopilotChatExplain<CR>";
+        options.desc = "Explain Code";
+      }
+      {
+        mode = "n";
+        key = "<leader>ap";
+        action = ":CopilotChatApproach<CR>";
+        options.desc = "Get Approach";
+      }
+      {
+        mode = "v";
+        key = "<leader>ap";
+        action = ":CopilotChatApproach<CR>";
+        options.desc = "Get Approach";
+      }
 
-      { mode = "n"; key = "<leader>ai"; action = ":CopilotChatImplement<CR>"; options.desc = "Implement (Full Code)"; }
-      { mode = "v"; key = "<leader>ai"; action = ":CopilotChatImplement<CR>"; options.desc = "Implement (Full Code)"; }
+      {
+        mode = "n";
+        key = "<leader>ai";
+        action = ":CopilotChatImplement<CR>";
+        options.desc = "Implement (Full Code)";
+      }
+      {
+        mode = "v";
+        key = "<leader>ai";
+        action = ":CopilotChatImplement<CR>";
+        options.desc = "Implement (Full Code)";
+      }
 
-      { mode = "n"; key = "<leader>uc"; action = ":ToggleCopilot<CR>";        options.desc = "Toggle Copilot Autocomplete"; }
+      {
+        mode = "n";
+        key = "<leader>uc";
+        action = ":ToggleCopilot<CR>";
+        options.desc = "Toggle Copilot Autocomplete";
+      }
+      */
 
       # Window nav
-      { mode = "n"; key = "<C-h>"; action = "<C-w>h"; }
-      { mode = "n"; key = "<C-j>"; action = "<C-w>j"; }
-      { mode = "n"; key = "<C-k>"; action = "<C-w>k"; }
-      { mode = "n"; key = "<C-l>"; action = "<C-w>l"; }
+      {
+        mode = "n";
+        key = "<C-h>";
+        action = "<C-w>h";
+      }
+      {
+        mode = "n";
+        key = "<C-j>";
+        action = "<C-w>j";
+      }
+      {
+        mode = "n";
+        key = "<C-k>";
+        action = "<C-w>k";
+      }
+      {
+        mode = "n";
+        key = "<C-l>";
+        action = "<C-w>l";
+      }
 
       # Save/quit
-      { mode = "n"; key = "<leader>w"; action = ":w<CR>"; options.desc = "Save"; }
-      { mode = "n"; key = "<leader>q"; action = ":q<CR>"; options.desc = "Quit"; }
+      {
+        mode = "n";
+        key = "<leader>w";
+        action = ":w<CR>";
+        options.desc = "Save";
+      }
+      {
+        mode = "n";
+        key = "<leader>q";
+        action = ":q<CR>";
+        options.desc = "Quit";
+      }
     ];
 
     colorschemes.catppuccin.enable = true;
