@@ -1,12 +1,16 @@
-{ config, pkgs, lib, ... }:
 {
+  config,
+  pkgs,
+  lib,
+  ...
+}: {
   home.stateVersion = "26.05";
   programs.home-manager.enable = true;
 
   nix = {
     package = lib.mkDefault pkgs.nix;
     settings = {
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = ["nix-command" "flakes"];
       # auto-optimise-store = true;
     };
   };
@@ -15,8 +19,8 @@
     enable = true;
     settings = {
       user = {
-        name = "Vilius Ivanovas";
-        email = "ivanovasvilius@example.com";
+        name = "Silvija Ivanovaite";
+        email = "ivanovasvilius@gmail.com";
       };
       init.defaultBranch = "main";
       core.editor = "nvim";
@@ -58,5 +62,7 @@
     jq
     eza
     glow
+    just
+    gnumake
   ];
 }

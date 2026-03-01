@@ -75,6 +75,7 @@
     "browserosaurus"
     "thunderbird"
     "proton-mail-bridge"
+    "macfuse"
 
     # Security/Privacy
     "protonvpn"
