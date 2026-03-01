@@ -1,9 +1,12 @@
-{ config, pkgs, ... }:
 {
+  config,
+  pkgs,
+  ...
+}: {
   services.jellyfin = {
     enable = true;
     openFirewall = true;
-    dataDir = "/var/lib/jellyfin/";
+    dataDir = "/data/media";
   };
 
   # Optional: reverse proxy with nginx
