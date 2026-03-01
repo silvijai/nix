@@ -34,9 +34,7 @@
     description = "MAID Server User";
     extraGroups = ["wheel" "networkmanager" "docker"];
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICTvgyYoBDtLaPAe0kx+Ldb4Pu4pGSuilcvKH7+miTT4 viliusi@Viliuss-MacBook-Pro.local"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJ6q2rj/38D17KJnS6xkeXG20SIqMrer7NPxxx0cWIQY u0_a479@localhost"
-      "SHA256:Szdfcp+QJp872HXSpsXDUSjoVu0RJV20Um7SuvT99CY silvija@Silvijas-MacBook-Pro.local"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINZjWmLiOL1ugoshF12ltIP3Qk9EN6StzW4203UDvoMT silvija@Silvijas-MacBook-Pro.local"
     ];
   };
 
