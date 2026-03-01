@@ -52,6 +52,7 @@
     "gimp"
     "sage"
     "jupyterlab-app"
+    "microsoft-word"
 
     # Music Production
     "ableton-live-standard"
