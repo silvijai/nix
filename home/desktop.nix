@@ -17,6 +17,9 @@
   # Universal update alias (works on any NixOS system)
   programs.zsh.shellAliases = {
     update = "sudo nixos-rebuild switch --flake ~/nix#$(hostname)";
+
+    maid = "ssh maid";
+    maid-wake = "wakeonlan 98:29:a6:84:8a:fa";
   };
 
   # FULL macOS-STYLE SWAY CONFIG

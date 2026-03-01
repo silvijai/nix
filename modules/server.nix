@@ -63,6 +63,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    ethtool
     docker-compose
   ];
 }
