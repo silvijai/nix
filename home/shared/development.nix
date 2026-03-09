@@ -35,12 +35,15 @@
     ffmpeg
 
     # C++/C
-    conan
+    # conan
     cmake
+    cppcheck
+    arduino-cli
 
     # ---------- Utilities ----------
     wakeonlan
     arduino-cli
+    just
   ];
 
   programs.zsh.shellAliases = {

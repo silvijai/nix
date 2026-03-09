@@ -18,8 +18,8 @@
     "openmtp"
     "macs-fan-control"
     "hiddenbar"
-    "mos"
     "monitorcontrol"
+    "mos@beta"
 
     # Browsers
     "zen"
@@ -38,7 +38,6 @@
     "utm"
     "kitty"
     "vscodium"
-    "arduino-ide"
     "xquartz"
     "librepcb"
 
@@ -88,7 +87,7 @@
     "steam"
     "whisky"
     "heroic"
-    "Sikarugir-App/sikarugir/sikarugir"
+    "roblox"
 
     # AI
     "anythingllm"

@@ -151,11 +151,24 @@
       lint = {
         enable = true;
         lintersByFt = {
+          # JS/TS
           javascript = ["eslint"];
           typescript = ["eslint"];
+
+          # Python
           python = ["ruff"];
+
+          # C/C++ - use cppcheck only (standalone linter)
+          c = ["cppcheck"];
+          cpp = ["cppcheck"];
+
+          # Rust
+          rust = ["clippy"];
         };
       };
+
+      plugins.mason.ensureInstalled = ["clangd"];
+      plugins.lsp.servers.clangd.enable = true;
 
       # ---------- Copilot ----------
       /*

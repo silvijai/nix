@@ -28,7 +28,11 @@ in {
       upgrade = true;
     };
 
-    brews = ["mas" "qemu" "avra" "avrdude" "freerdp"];
+    brews = ["mas" "qemu" "avra" "avrdude" "freerdp" "avr-gcc@14" "osx-cross/avr/avr-binutils"];
+
+    taps = [
+      "osx-cross/avr"
+    ];
 
     casks = darwinApps.macosPreferCask;
 
@@ -40,6 +44,10 @@ in {
       "Command X" = 6448461551;
       "DaVinci Resolve" = 571213070;
     };
+  };
+
+  environment.variables = {
+    PATH = "/opt/homebrew/opt/avr-gcc@14/bin:" + config.environment.systemPath;
   };
 
   # System defaults
