@@ -16,14 +16,14 @@
     cairo
 
     # ---------- C# ----------
-    # dotnet-sdk
+    dotnet-sdk
 
     # ---------- JavaScript / TypeScript ----------
     nodejs_24
-    nodePackages.typescript
-    nodePackages.typescript-language-server
-    nodePackages.prettier
-    nodePackages.eslint
+    typescript
+    typescript-language-server
+    prettier
+    eslint
     bun
 
     # ---------- Rust ----------

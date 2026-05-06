@@ -1,18 +1,21 @@
-{ inputs, ... }:
-let
+{inputs, ...}: let
   # New helper for non-NixOS Linux + Nix (Home Manager standalone)
-  mkNixLinuxSystem = { hostname, system ? "x86_64-linux", homeModule, user }:
+  mkNixLinuxSystem = {
+    hostname,
+    system ? "x86_64-linux",
+    homeModule,
+    user,
+  }:
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = inputs.nixpkgs.legacyPackages.${system};
-      
+
       modules = [
         homeModule
       ];
-      
-      extraSpecialArgs = { inherit inputs user; };
+
+      extraSpecialArgs = {inherit inputs user;};
     };
-in
-{
+in {
   # New: Standalone Home Manager configs for non-NixOS Linux
   flake.homeConfigurations = {
     "silvija@linux-desktop" = mkNixLinuxSystem {
@@ -25,7 +28,14 @@ in
     "silvija@fedora-asahi-mac" = mkNixLinuxSystem {
       hostname = "fedora-asahi-mac";
       system = "aarch64-linux";
-      homeModule = ../home/desktop-asahi.nix;  # Reuse Asahi-tuned home config
+      homeModule = ../home/desktop-asahi.nix; # Reuse Asahi-tuned home config
+      user = "silvija";
+    };
+
+    "silvija@fedora-utm" = mkNixLinuxSystem {
+      hostname = "fedora-utm";
+      system = "aarch64-linux";
+      homeModule = ../home/desktop-asahi.nix; # Reuses Linux apps + Sway + shared logic
       user = "silvija";
     };
   };

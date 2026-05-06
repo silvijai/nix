@@ -7,8 +7,6 @@
   macosPreferCask = [
     # Window Management
     "raycast"
-    "alt-tab"
-    "amethyst"
     "loop"
 
     # System Utilities
@@ -20,11 +18,11 @@
     "hiddenbar"
     "monitorcontrol"
     "mos@beta"
+    "logi-options+"
 
     # Browsers
     "zen"
     "min"
-    "qutebrowser"
     "sigmaos"
     "librewolf"
     "orion"
@@ -38,7 +36,6 @@
     "utm"
     "kitty"
     "vscodium"
-    "xquartz"
     "librepcb"
 
     # Creative Suite
@@ -52,6 +49,7 @@
     "sage"
     "jupyterlab-app"
     "microsoft-word"
+    "spacedrive"
 
     # Music Production
     "ableton-live-standard"
@@ -71,7 +69,6 @@
     "anki"
     "deepl"
     "ticktick"
-    "browserosaurus"
     "thunderbird"
     "proton-mail-bridge"
     "macfuse"
@@ -88,9 +85,10 @@
     "whisky"
     "heroic"
     "roblox"
+    "mythic"
+    "prismlauncher"
 
     # AI
-    "anythingllm"
     "ollama-app"
 
     # Entertainment
@@ -99,5 +97,7 @@
     "sioyek"
     "libreoffice"
     "libreoffice-language-pack"
+
+    "docker-desktop"
   ];
 }

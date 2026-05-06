@@ -28,11 +28,7 @@ in {
       upgrade = true;
     };
 
-    brews = ["mas" "qemu" "avra" "avrdude" "freerdp" "avr-gcc@14" "osx-cross/avr/avr-binutils"];
-
-    taps = [
-      "osx-cross/avr"
-    ];
+    brews = ["mas" "qemu" "avra" "avrdude"];
 
     casks = darwinApps.macosPreferCask;
 

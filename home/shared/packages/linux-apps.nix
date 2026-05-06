@@ -5,10 +5,6 @@
 }: {
   # Native Nix packages (Linux)
   linuxNix = with pkgs; [
-    # Browsers
-    firefox
-    (chromium.override {commandLineArgs = "--enable-features=VaapiVideoDecoder";})
-
     # Communication
     vesktop
     element-desktop

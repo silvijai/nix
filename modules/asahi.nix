@@ -1,12 +1,17 @@
-{ config, pkgs, lib, inputs, ... }:
 {
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}: {
   imports = [];
-  
+
   # Apple Silicon hardware support
   hardware.asahi = {
     enable = true;
     setupAsahiSound = true;
-    
+
     # Only extract firmware if the directory exists (during actual installation)
     extractPeripheralFirmware = lib.mkDefault (builtins.pathExists ../../firmware);
     peripheralFirmwareDirectory = lib.mkIf (builtins.pathExists ../../firmware) ../../firmware;
@@ -18,6 +23,7 @@
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
       "https://nixos-apple-silicon.cachix.org"
+      "astral-sh.cachix.org-1:3ZVXI3V4L0v2I7ZdYFbBgFCBVDqRMmJvkgQMGmRuFsM="
     ];
     trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
@@ -28,13 +34,13 @@
 
   # Kernel
   boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_asahi;
-  boot.kernelParams = [ "apple_dcp.show_notch=1" ];
+  boot.kernelParams = ["apple_dcp.show_notch=1"];
   boot.extraModprobeConfig = ''
     options hid_apple iso_layout=0
   '';
 
   # Graphics (GPU support is now in mainline Mesa)
-  services.xserver.videoDrivers = [ "modesetting" ];
+  services.xserver.videoDrivers = ["modesetting"];
 
   # WiFi
   networking.wireless.iwd = {
@@ -68,4 +74,3 @@
     package = pkgs.tiny-dfr;
   };
 }
-

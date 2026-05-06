@@ -34,18 +34,22 @@
       ripgrep
       fd
 
+      # .NET / C#
+      dotnet-sdk
+      omnisharp-roslyn
+
       # LSP servers
       lua-language-server
       nixd
       rust-analyzer
-      nodePackages.typescript-language-server
-      nodePackages.eslint
+      typescript-language-server
+      eslint
       python3Packages.python-lsp-server
 
       # Formatters
       alejandra
       rustfmt
-      nodePackages.prettier
+      prettier
       python3Packages.black
       python3Packages.ruff
     ];
@@ -114,6 +118,17 @@
 
           # Lua (optional, for Neovim config)
           lua_ls.enable = true;
+
+          # C#
+          omnisharp = {
+            enable = true;
+            cmd = ["omnisharp"];
+            settings = {
+              enable_roslyn_analyzers = true;
+              organize_imports_on_format = true;
+              enable_import_completion = true;
+            };
+          };
         };
       };
 
@@ -121,6 +136,7 @@
       treesitter = {
         enable = true;
         nixGrammars = true;
+        grammars = ["c_sharp"];
       };
 
       # ---------- Completion ----------
@@ -139,10 +155,19 @@
             rust = ["rustfmt"];
             nix = ["alejandra"];
             python = ["black"];
+            cs = ["dotnet_format"];
           };
           format_on_save = {
             lsp_format = "fallback";
-            timeout_ms = 500;
+            timeout_ms = 3000;
+          };
+          # Optional: define a custom formatter
+          formatters = {
+            dotnet_format = {
+              command = "dotnet";
+              args = ["format"];
+              stdin = false;
+            };
           };
         };
       };
@@ -164,6 +189,8 @@
 
           # Rust
           rust = ["clippy"];
+
+          # cs = [ "your-csharp-linter" ]; # optional later
         };
       };
 
@@ -389,6 +416,8 @@
       vim.keymap.set('n', '<leader>d[', vim.diagnostic.goto_prev,  { desc = "Prev diagnostic" })
       vim.keymap.set('n', '<leader>d]', vim.diagnostic.goto_next,  { desc = "Next diagnostic" })
       vim.keymap.set('n', '<leader>dd', "<cmd>Telescope diagnostics<CR>", { desc = "Diagnostics" })
+
+      vim.keymap.set('n', '<leader>n', "<cmd>set nohlsearch<CR>", { desc = "Clear search" })
 
       -- Toggle Copilot Autocomplete
       vim.api.nvim_create_user_command('ToggleCopilot', function()

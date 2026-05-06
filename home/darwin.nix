@@ -19,11 +19,6 @@ in {
 
   # macOS-ONLY packages (things from Homebrew casks that need macOS)
   home.packages = with pkgs; [
-    # macOS-specific development tools
-    docker-client # Docker Desktop on macOS
-
-    # Note: Many GUI apps installed via Homebrew in darwin/configuration.nix
-    # because they're better maintained as casks
   ];
 
   # Setup SharedData symlinks via home-manager activation
